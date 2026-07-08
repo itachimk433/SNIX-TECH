@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, query, onSnapshot, doc, updateDoc, setDoc, deleteDoc, where, increment, getDocs, addDoc } from "firebase/firestore";
+import { collection, query, onSnapshot, doc, getDoc, updateDoc, setDoc, deleteDoc, where, increment, getDocs, addDoc } from "firebase/firestore";
 import { VPNPost, VPN_APPS_LIST, PostReaction, COUNTRIES } from "../types";
 
 import { Search, Download, Copy, Layers, Sparkles, Eye, EyeOff, Cloud, FileCode, LogIn, Clock, CheckCircle, MessageCircle, Trash2, Globe, RefreshCw, UserCheck, Trophy, Flag, X } from "lucide-react";
@@ -387,12 +387,10 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
           // the auto-detect to clobber a country the user picked manually.
           const uid = auth.currentUser?.uid;
           if (uid) {
-            import("firebase/firestore").then(({ doc: fsDoc, getDoc, updateDoc: fsUpdateDoc }) => {
-              getDoc(fsDoc(db, "users", uid)).then(snap => {
-                if (snap.exists() && !snap.data()?.country) {
-                  fsUpdateDoc(fsDoc(db, "users", uid), { country: code }).catch(() => {});
-                }
-              }).catch(() => {});
+            getDoc(doc(db, "users", uid)).then(snap => {
+              if (snap.exists() && !snap.data()?.country) {
+                updateDoc(doc(db, "users", uid), { country: code }).catch(() => {});
+              }
             }).catch(() => {});
           }
         }
@@ -518,6 +516,17 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
   // fixed frame count.
   const [scrolledToHighlight, setScrolledToHighlight] = useState(false);
   useEffect(() => { setScrolledToHighlight(false); }, [highlightPostId]);
+
+  const currentUserId = auth.currentUser?.uid;
+  const filteredPosts = posts.filter(p => {
+    const vpnName = p.vpnApp==="Other"?(p.customVpnName||"Other"):p.vpnApp;
+    const matchSearch = [p.title,p.description,vpnName,p.authorName].some(s=>s.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchApp = selectedAppFilter==="All" || p.vpnApp===selectedAppFilter;
+    const matchCountry = selectedCountryFilter==="All"
+      || (p.countries && (p.countries.includes(selectedCountryFilter) || p.countries.includes('GLOBAL')));
+    const matchFollowing = !followingOnly || followingUids.includes(p.uid);
+    return matchSearch && matchApp && matchCountry && matchFollowing;
+  });
 
   useEffect(() => {
     if (!highlightPostId || scrolledToHighlight) return;
@@ -727,17 +736,6 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
   // Builds a human-readable share message tailored to the post's content type,
   // then uses the Web Share API (Android native share sheet) or falls back to
   // copying the message to the clipboard.
-  const currentUserId = auth.currentUser?.uid;
-  const filteredPosts = posts.filter(p => {
-    const vpnName = p.vpnApp==="Other"?(p.customVpnName||"Other"):p.vpnApp;
-    const matchSearch = [p.title,p.description,vpnName,p.authorName].some(s=>s.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchApp = selectedAppFilter==="All" || p.vpnApp===selectedAppFilter;
-    const matchCountry = selectedCountryFilter==="All"
-      || (p.countries && (p.countries.includes(selectedCountryFilter) || p.countries.includes('GLOBAL')));
-    const matchFollowing = !followingOnly || followingUids.includes(p.uid);
-    return matchSearch && matchApp && matchCountry && matchFollowing;
-  });
-
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
       {guestAction && <GuestPrompt action={guestAction} onSignIn={() => { setGuestAction(null); onSignInRequired(); }} />}

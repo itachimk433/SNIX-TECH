@@ -65,6 +65,10 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Source maps let the browser devtools (and any future error reports)
+    // point at the real file/line instead of a minified name like "Ke" —
+    // this is what makes production runtime errors debuggable at all.
+    sourcemap: true,
   },
   server: {
     port,
