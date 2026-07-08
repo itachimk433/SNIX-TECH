@@ -18,6 +18,19 @@ const router: IRouter = Router();
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = "gemini-2.0-flash";
 
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+
+// Which provider to try first. Defaults to Gemini (the original behavior).
+// Set AI_PROVIDER=openai on the server to prefer OpenAI instead. Whichever
+// provider isn't preferred is still used as an automatic fallback if the
+// preferred one has no key configured or its request fails/is rate-limited,
+// as long as its own key is present.
+type Provider = "gemini" | "openai";
+const PREFERRED_PROVIDER: Provider = (process.env.AI_PROVIDER || "gemini").toLowerCase() === "openai"
+  ? "openai"
+  : "gemini";
+
 // Basic in-memory rate limiting (mirrors routes/gifs.ts)
 const WINDOW_MS = 60_000;
 const MAX_PER_IP = 20;
@@ -100,8 +113,8 @@ router.post("/assistant/chat", async (req, res) => {
     return;
   }
 
-  if (!GEMINI_API_KEY) {
-    logger.error("assistant: GEMINI_API_KEY is not configured");
+  if (!GEMINI_API_KEY && !OPENAI_API_KEY) {
+    logger.error("assistant: no AI provider configured (set GEMINI_API_KEY and/or OPENAI_API_KEY)");
     res.status(503).json({ ok: false, error: "assistant_unavailable" });
     return;
   }
@@ -122,6 +135,48 @@ router.post("/assistant/chat", async (req, res) => {
 
   const contents: GeminiContent[] = [...history, { role: "user", parts: [{ text: message }] }];
 
+  // Try the preferred provider first, then fall back to the other one if it
+  // has a key configured — so a Gemini outage/quota limit doesn't take the
+  // assistant down entirely when an OpenAI key is also set (and vice versa).
+  const order: Provider[] = PREFERRED_PROVIDER === "openai" ? ["openai", "gemini"] : ["gemini", "openai"];
+
+  let lastError: { status: number } | null = null;
+  for (const provider of order) {
+    if (provider === "gemini" && !GEMINI_API_KEY) continue;
+    if (provider === "openai" && !OPENAI_API_KEY) continue;
+
+    const result = provider === "gemini"
+      ? await callGemini(contents)
+      : await callOpenAI(history, message);
+
+    if (!result.ok) {
+      logger.warn({ provider, status: result.status }, "assistant: upstream call failed");
+      lastError = { status: result.status };
+      continue;
+    }
+
+    if (!result.reply) {
+      lastError = { status: 502 };
+      continue;
+    }
+
+    if (looksLikeLeak(result.reply)) {
+      logger.warn({ ip, provider }, "assistant: model reply blocked by output guardrail");
+      res.json({ ok: true, reply: DECLINE_REPLY });
+      return;
+    }
+
+    res.json({ ok: true, reply: result.reply });
+    return;
+  }
+
+  res.status(lastError?.status && lastError.status >= 400 && lastError.status < 600 ? lastError.status : 502)
+    .json({ ok: false, error: "upstream_failed" });
+});
+
+type ProviderResult = { ok: true; reply: string } | { ok: false; status: number };
+
+async function callGemini(contents: GeminiContent[]): Promise<ProviderResult> {
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
     const upstream = await fetch(url, {
@@ -136,32 +191,63 @@ router.post("/assistant/chat", async (req, res) => {
 
     if (!upstream.ok) {
       const errBody = await upstream.text().catch(() => "");
-      logger.warn({ status: upstream.status, errBody }, "assistant: upstream Gemini call failed");
-      res.status(502).json({ ok: false, error: "upstream_failed" });
-      return;
+      logger.warn({ status: upstream.status, errBody }, "assistant: Gemini call failed");
+      return { ok: false, status: upstream.status };
     }
 
     const data = await upstream.json() as {
       candidates?: { content?: { parts?: { text?: string }[] } }[];
     };
     const reply = data.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("").trim();
-
-    if (!reply) {
-      res.status(502).json({ ok: false, error: "empty_reply" });
-      return;
-    }
-
-    if (looksLikeLeak(reply)) {
-      logger.warn({ ip }, "assistant: model reply blocked by output guardrail");
-      res.json({ ok: true, reply: DECLINE_REPLY });
-      return;
-    }
-
-    res.json({ ok: true, reply });
+    if (!reply) return { ok: false, status: 502 };
+    return { ok: true, reply };
   } catch (err) {
-    logger.warn({ err }, "assistant: request failed");
-    res.status(502).json({ ok: false, error: "upstream_failed" });
+    logger.warn({ err }, "assistant: Gemini request threw");
+    return { ok: false, status: 502 };
   }
-});
+}
+
+async function callOpenAI(history: GeminiContent[], message: string): Promise<ProviderResult> {
+  try {
+    const messages = [
+      { role: "system" as const, content: SYSTEM_PROMPT },
+      ...history.map(h => ({
+        role: (h.role === "model" ? "assistant" : "user") as "assistant" | "user",
+        content: h.parts.map(p => p.text).join(""),
+      })),
+      { role: "user" as const, content: message },
+    ];
+
+    const upstream = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
+        messages,
+        temperature: 0.4,
+        max_tokens: 400,
+      }),
+    });
+
+    if (!upstream.ok) {
+      const errBody = await upstream.text().catch(() => "");
+      logger.warn({ status: upstream.status, errBody }, "assistant: OpenAI call failed");
+      return { ok: false, status: upstream.status };
+    }
+
+    const data = await upstream.json() as {
+      choices?: { message?: { content?: string } }[];
+    };
+    const reply = data.choices?.[0]?.message?.content?.trim();
+    if (!reply) return { ok: false, status: 502 };
+    return { ok: true, reply };
+  } catch (err) {
+    logger.warn({ err }, "assistant: OpenAI request threw");
+    return { ok: false, status: 502 };
+  }
+}
 
 export default router;
