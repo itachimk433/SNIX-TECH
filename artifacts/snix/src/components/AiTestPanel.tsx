@@ -37,7 +37,12 @@ async function listOpenAiModels(key: string): Promise<ModelOption[]> {
 }
 
 async function listGeminiModels(key: string): Promise<ModelOption[]> {
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`);
+  // Use the x-goog-api-key header rather than a ?key= query param so the
+  // key doesn't end up in browser history, proxy logs, or network tooling
+  // that captures full request URLs.
+  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
+    headers: { "x-goog-api-key": key },
+  });
   if (!res.ok) throw new Error(`Gemini rejected the key (HTTP ${res.status}).`);
   const data = await res.json() as { models?: { name: string; displayName?: string; supportedGenerationMethods?: string[] }[] };
   return (data.models || [])
@@ -67,9 +72,9 @@ async function chatGemini(key: string, model: string, history: ChatMsg[], messag
     ...history.map(h => ({ role: h.role === "assistant" ? "model" : "user", parts: [{ text: h.text }] })),
     { role: "user", parts: [{ text: message }] },
   ];
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`, {
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-goog-api-key": key },
     body: JSON.stringify({ contents, generationConfig: { temperature: 0.6, maxOutputTokens: 500 } }),
   });
   const j = await res.json().catch(() => null) as { candidates?: { content?: { parts?: { text?: string }[] } }[]; error?: { message?: string } } | null;
