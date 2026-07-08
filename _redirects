@@ -1,0 +1,3 @@
+# Cloudflare Pages redirect rules
+# Serve /post/<any-id> from the same post/index.html (client reads the ID from the URL)
+/post/*  /post/index.html  200

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "860805859882",
+    "project_id": "snix-2a816",
+    "storage_bucket": "snix-2a816.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:860805859882:android:d39f48364df645081ad153",
+        "android_client_info": {
+          "package_name": "com.mkdev.snix"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "860805859882-35ii5shc71h0c8pup578ivv2jm4j9pat.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mkdev.snix",
+            "certificate_hash": "49ab62c626ac0a7fb4ffb7f9c309fe4d10f6508a"
+          }
+        },
+        {
+          "client_id": "860805859882-233qp04339vqkkmgu3sspp8t5t2o294d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPrNwx8PRu6mnSnSdQ4Kgkrv36poweTPk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "860805859882-233qp04339vqkkmgu3sspp8t5t2o294d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SNIX — View Config</title>
+  <meta name="description" content="View this VPN config on SNIX." />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #020617; color: #f8fafc;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 2rem; text-align: center;
+    }
+    .icon {
+      width: 72px; height: 72px; border-radius: 22px;
+      box-shadow: 0 0 50px rgba(37,99,235,0.4); margin: 0 auto 1.25rem;
+      background: linear-gradient(135deg, #2563eb, #10b981);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 900; color: #fff;
+    }
+    h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -.5px; margin-bottom: .25rem; }
+    .sub { color: #64748b; font-size: .8rem; margin-bottom: .75rem; }
+    .post-id {
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 10px;
+      padding: .5rem 1rem; font-family: monospace; font-size: .75rem;
+      color: #94a3b8; margin-bottom: 2rem; max-width: 300px;
+      word-break: break-all;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .85rem 2rem; border-radius: 14px; font-weight: 700;
+      font-size: .85rem; letter-spacing: .05em; text-transform: uppercase;
+      text-decoration: none; cursor: pointer; border: none;
+      transition: opacity .15s; margin: .35rem auto;
+      width: 100%; max-width: 280px; justify-content: center;
+    }
+    .btn:active { opacity: .75; }
+    .btn-primary { background: linear-gradient(135deg, #2563eb, #10b981); color: #fff; }
+    .btn-secondary { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; }
+    .divider { color: #334155; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; margin: 1rem 0; }
+    .note { color: #475569; font-size: .7rem; margin-top: 1.5rem; max-width: 260px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="icon">S</div>
+  <h1>SNIX Config</h1>
+  <p class="sub">Shared via the SNIX VPN Hub</p>
+  <div class="post-id" id="post-id">Loading…</div>
+
+  <button id="open-app" class="btn btn-primary">Open in SNIX App</button>
+  <div class="divider">don't have SNIX?</div>
+  <a href="https://play.google.com/store/apps/details?id=com.mkdev.snix" class="btn btn-secondary">
+    📱 Download for Android
+  </a>
+  <p class="note" id="note">
+    Tap "Open in SNIX App" above to view this config directly in the app.
+  </p>
+
+  <script>
+    var PACKAGE   = 'com.mkdev.snix';
+    var PLAY_URL  = 'https://play.google.com/store/apps/details?id=' + PACKAGE;
+
+    // Extract post ID from the URL path: /post/<id>
+    var parts  = window.location.pathname.split('/').filter(Boolean);
+    var postId = parts[parts.length - 1] || '';
+    if (postId === 'index.html') postId = '';
+
+    if (postId) {
+      document.getElementById('post-id').textContent = 'Post: ' + postId;
+    } else {
+      document.getElementById('post-id').textContent = 'No post ID found in URL.';
+    }
+
+    var isAndroid = /Android/i.test(navigator.userAgent);
+    var isIOS     = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    function buildDeepLink(id) {
+      if (isAndroid) {
+        // Android Intent URI — Chrome will open SNIX directly if installed,
+        // or fall back to the Play Store if not.
+        return 'intent://post/' + id
+          + '#Intent;scheme=snix;package=' + PACKAGE
+          + ';S.browser_fallback_url=' + encodeURIComponent(PLAY_URL)
+          + ';end';
+      }
+      // iOS / other — standard custom scheme
+      return 'snix://post/' + id;
+    }
+
+    document.getElementById('open-app').addEventListener('click', function () {
+      var target = postId ? buildDeepLink(postId) : (isAndroid
+        ? 'intent://feed#Intent;scheme=snix;package=' + PACKAGE + ';S.browser_fallback_url=' + encodeURIComponent(PLAY_URL) + ';end'
+        : 'snix://feed');
+
+      if (!isAndroid && !isIOS) {
+        document.getElementById('note').textContent =
+          'Deep links only work on Android or iOS. Download the app on your phone.';
+        return;
+      }
+      window.location.href = target;
+    });
+  </script>
+</body>
+</html>
