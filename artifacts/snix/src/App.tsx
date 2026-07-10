@@ -297,7 +297,7 @@ function SettingsModal({ onClose, isGuest, onSignInRequired }: { onClose: () => 
                 <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center"><Mail size={16} className="text-blue-600" /></div>
                 <div className="text-left">
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Contact</p>
-                  <a href="mailto:mkdev12@gmail.com" className="text-xs font-bold text-blue-600">mkdev12@gmail.com</a>
+                  <a href="mailto:mkdev4360@gmail.com" className="text-xs font-bold text-blue-600">mkdev4360@gmail.com</a>
                 </div>
               </div>
               <div className="flex items-center gap-3">

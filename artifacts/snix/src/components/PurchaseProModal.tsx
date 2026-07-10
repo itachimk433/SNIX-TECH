@@ -109,7 +109,7 @@ export default function PurchaseProModal({ onClose, onSuccess }: PurchaseProModa
               : <><Star size={16} fill="white" /> Purchase Pro</>}
           </button>
           <p className="text-[9px] text-slate-400 text-center leading-relaxed">
-            By purchasing you agree to the SNIX terms. Contact mkdev12@gmail.com for support.
+            By purchasing you agree to the SNIX terms. Contact mkdev4360@gmail.com for support.
           </p>
         </div>
       </div>
