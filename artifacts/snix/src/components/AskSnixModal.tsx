@@ -137,7 +137,7 @@ async function askGemini(message: string, history: ChatMsg[]): Promise<string> {
 export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
   onClose: () => void; isGuest?: boolean; uid?: string | null;
 }) {
-  const { openKeyboard } = useKeyboard();
+  const { openKeyboard, settings: kbSettings } = useKeyboard();
   const [messages, setMessages] = useState<ChatMsg[]>(() => loadHistory(uid) || [
     { role: "model", text: GREETING },
   ]);
@@ -262,22 +262,35 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
         </div>
 
         <div className="flex items-center gap-2 px-4 py-3 border-t border-slate-100 shrink-0">
-          {/* Tappable fake-input — opens in-app keyboard so native keyboard never appears */}
-          <div
-            className={`flex-1 bg-slate-100 rounded-xl px-3.5 py-2.5 text-xs font-medium cursor-pointer select-none min-h-[38px] flex items-center ${(sending || guestLimitReached) ? "opacity-50 pointer-events-none" : ""}`}
-            onPointerUp={() => !sending && !guestLimitReached && openKeyboard(input, {
-              onChange: (v) => { setInput(v); inputRef.current = v; },
-              onSubmit: () => send(inputRef.current),
-              placeholder: "Ask about how SNIX works…",
-            })}
-          >
-            {guestLimitReached
-              ? <span className="text-slate-400">Sign in to keep chatting…</span>
-              : input
-                ? <span className="text-slate-800 break-words">{input}</span>
-                : <span className="text-slate-400">Ask about how SNIX works…</span>
-            }
-          </div>
+          {kbSettings.enabled ? (
+            /* In-app keyboard enabled — tappable fake-input opens the overlay */
+            <div
+              className={`flex-1 bg-slate-100 rounded-xl px-3.5 py-2.5 text-xs font-medium cursor-pointer select-none min-h-[38px] flex items-center ${(sending || guestLimitReached) ? "opacity-50 pointer-events-none" : ""}`}
+              onPointerUp={() => !sending && !guestLimitReached && openKeyboard(input, {
+                onChange: (v) => { setInput(v); inputRef.current = v; },
+                onSubmit: () => send(inputRef.current),
+                placeholder: "Ask about how SNIX works…",
+              })}
+            >
+              {guestLimitReached
+                ? <span className="text-slate-400">Sign in to keep chatting…</span>
+                : input
+                  ? <span className="text-slate-800 break-words">{input}</span>
+                  : <span className="text-slate-400">Ask about how SNIX works…</span>
+              }
+            </div>
+          ) : (
+            /* In-app keyboard disabled — native browser input */
+            <input
+              type="text"
+              value={input}
+              onChange={e => { setInput(e.target.value); inputRef.current = e.target.value; }}
+              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(inputRef.current); } }}
+              placeholder={guestLimitReached ? "Sign in to keep chatting…" : "Ask about how SNIX works…"}
+              disabled={sending || guestLimitReached}
+              className="flex-1 bg-slate-100 rounded-xl px-3.5 py-2.5 text-xs font-medium min-h-[38px] outline-none disabled:opacity-50 placeholder:text-slate-400"
+            />
+          )}
           <button
             onPointerDown={e => { e.preventDefault(); send(inputRef.current); }}
             disabled={sending || !input.trim() || guestLimitReached}

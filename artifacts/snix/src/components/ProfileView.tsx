@@ -208,7 +208,7 @@ function BannerPickerModal({ currentUrl, onSelect, onClose }: {
   onClose: () => void;
   userUid?: string;
 }) {
-  const { openKeyboard } = useKeyboard();
+  const { openKeyboard, settings: kbSettings } = useKeyboard();
   const [tab, setTab]             = useState<"search" | "url" | "presets">("search");
   const [sourceIdx, setSourceIdx] = useState(0);
   const [query, setQuery]         = useState("anime landscape");
@@ -350,11 +350,22 @@ function BannerPickerModal({ currentUrl, onSelect, onClose }: {
 
             {/* Search bar */}
             <div className="flex gap-2 px-5 pb-2 shrink-0">
-              <div onPointerUp={openSearchKeyboard}
-                className="flex-1 px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl cursor-pointer select-none min-w-0"
-              >
-                {query ? <span className="text-slate-800">{query}</span> : <span className="text-slate-400">anime landscape, city night, ocean...</span>}
-              </div>
+              {kbSettings.enabled ? (
+                <div onPointerUp={openSearchKeyboard}
+                  className="flex-1 px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl cursor-pointer select-none min-w-0"
+                >
+                  {query ? <span className="text-slate-800">{query}</span> : <span className="text-slate-400">anime landscape, city night, ocean...</span>}
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); doSearch(query); } }}
+                  placeholder="anime landscape, city night, ocean..."
+                  className="flex-1 px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none min-w-0"
+                />
+              )}
               <button onPointerUp={() => doSearch(query)} disabled={loading}
                 className="px-4 py-2.5 bg-slate-950 text-white text-xs font-bold rounded-xl disabled:opacity-50"
               >Search</button>
@@ -411,14 +422,26 @@ function BannerPickerModal({ currentUrl, onSelect, onClose }: {
               )}
             </div>
 
-            <div onPointerUp={openUrlKeyboard}
-              className="px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl cursor-pointer select-none min-h-[38px] leading-relaxed"
-            >
-              {inputUrl
-                ? <span className="text-slate-800 break-all">{inputUrl}</span>
-                : <span className="text-slate-400">https://media.giphy.com/media/.../giphy.gif</span>
-              }
-            </div>
+            {kbSettings.enabled ? (
+              <div onPointerUp={openUrlKeyboard}
+                className="px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl cursor-pointer select-none min-h-[38px] leading-relaxed"
+              >
+                {inputUrl
+                  ? <span className="text-slate-800 break-all">{inputUrl}</span>
+                  : <span className="text-slate-400">https://media.giphy.com/media/.../giphy.gif</span>
+                }
+              </div>
+            ) : (
+              <input
+                type="url"
+                value={inputUrl}
+                onChange={e => { setInputUrl(e.target.value); inputUrlRef.current = e.target.value; }}
+                onBlur={() => { setPreviewUrl(inputUrl.trim()); setPreviewError(false); }}
+                onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); setPreviewUrl(inputUrl.trim()); setPreviewError(false); } }}
+                placeholder="https://media.giphy.com/media/.../giphy.gif"
+                className="px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none min-h-[38px] w-full break-all"
+              />
+            )}
 
             <div className="flex gap-2">
               {currentUrl && (

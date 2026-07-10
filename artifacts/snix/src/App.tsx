@@ -246,24 +246,43 @@ function SettingsModal({ onClose, isGuest, onSignInRequired }: { onClose: () => 
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center"><Keyboard size={16} className="text-blue-600" /></div>
               <div>
-                <h3 className="text-sm font-black text-slate-900">Keyboard</h3>
-                <p className="text-[10px] text-slate-400">Key height in the in-app keyboard</p>
+                <h3 className="text-sm font-black text-slate-900">In-App Keyboard</h3>
+                <p className="text-[10px] text-slate-400">Custom keyboard overlay (for APK only)</p>
               </div>
             </div>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1"><Maximize2 size={10} /> Key Size</p>
-            <div className="flex gap-2">
-              {HEIGHTS.map(h => (
-                <button key={h.value} onClick={() => updateSettings({ height: h.value })}
-                  className={`relative flex-1 flex flex-col items-center gap-1 py-3 rounded-xl border-2 transition-all overflow-hidden ${
-                    settings.height === h.value ? "border-blue-500 bg-blue-50/60"
-                    : "border-slate-100 bg-slate-50 hover:border-slate-200"}`}>
-                  <div className={`w-8 rounded-lg bg-slate-200 ${h.value === "compact" ? "h-5" : h.value === "normal" ? "h-7" : "h-9"}`} />
-                  <p className="text-[10px] font-bold text-slate-700">{h.label}</p>
-                  <p className="text-[9px] text-slate-400">{h.sub}</p>
-                  {settings.height === h.value && <p className="text-[9px] text-blue-600 font-semibold">Active</p>}
-                </button>
-              ))}
-            </div>
+            {/* Enable / disable toggle */}
+            <button
+              onClick={() => updateSettings({ enabled: !settings.enabled })}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all mb-4 ${
+                settings.enabled ? "border-blue-500 bg-blue-50/60" : "border-slate-100 bg-slate-50"
+              }`}
+            >
+              <div className="text-left">
+                <p className="text-xs font-bold text-slate-800">Use in-app keyboard</p>
+                <p className="text-[9px] text-slate-400">Disable for web/browser — use your device keyboard instead</p>
+              </div>
+              <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${settings.enabled ? "bg-blue-500" : "bg-slate-200"}`}>
+                <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${settings.enabled ? "translate-x-4" : "translate-x-0"}`} />
+              </div>
+            </button>
+            {settings.enabled && (
+              <>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1"><Maximize2 size={10} /> Key Size</p>
+                <div className="flex gap-2">
+                  {HEIGHTS.map(h => (
+                    <button key={h.value} onClick={() => updateSettings({ height: h.value })}
+                      className={`relative flex-1 flex flex-col items-center gap-1 py-3 rounded-xl border-2 transition-all overflow-hidden ${
+                        settings.height === h.value ? "border-blue-500 bg-blue-50/60"
+                        : "border-slate-100 bg-slate-50 hover:border-slate-200"}`}>
+                      <div className={`w-8 rounded-lg bg-slate-200 ${h.value === "compact" ? "h-5" : h.value === "normal" ? "h-7" : "h-9"}`} />
+                      <p className="text-[10px] font-bold text-slate-700">{h.label}</p>
+                      <p className="text-[9px] text-slate-400">{h.sub}</p>
+                      {settings.height === h.value && <p className="text-[9px] text-blue-600 font-semibold">Active</p>}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
           <div className="h-px bg-slate-100" />
 

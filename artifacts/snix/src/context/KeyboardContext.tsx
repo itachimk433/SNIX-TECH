@@ -8,9 +8,13 @@ export type KBHeight = "compact" | "normal" | "tall";
 export interface KeyboardSettings {
   theme: KBTheme;
   height: KBHeight;
+  /** When false (the default), openKeyboard() is a no-op and native browser
+   *  inputs are used instead. Disable this for web/Cloudflare deployments
+   *  where the native keyboard works fine. Enable only on Android APK builds. */
+  enabled: boolean;
 }
 
-const DEFAULT_SETTINGS: KeyboardSettings = { theme: "light", height: "tall" };
+const DEFAULT_SETTINGS: KeyboardSettings = { theme: "light", height: "tall", enabled: false };
 const STORAGE_KEY = "snix_kb_settings";
 
 function loadSettings(): KeyboardSettings {
@@ -68,6 +72,10 @@ export function KeyboardProvider({ children }: { children: React.ReactNode }) {
   const [submitting, setSubmitting] = useState(false);
   const sessionRef = useRef<KeyboardSession | null>(null);
   const openedAtRef = useRef<number>(0);
+  // Keep a ref so openKeyboard always reads the latest enabled flag without
+  // needing it in the dependency array (avoids closing over a stale value).
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
 
   // Apply app-wide theme via data attribute whenever theme changes
   useEffect(() => {
@@ -83,6 +91,8 @@ export function KeyboardProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const openKeyboard = useCallback((initialValue: string, session: KeyboardSession) => {
+    // No-op when in-app keyboard is disabled — native browser input takes over.
+    if (!settingsRef.current.enabled) return;
     sessionRef.current = session;
     setDisplayValue(initialValue);
     setSubmitting(false);
