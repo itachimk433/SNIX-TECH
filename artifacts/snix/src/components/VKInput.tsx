@@ -32,7 +32,7 @@ export default function VKInput({
   inputClassName = "", label, required, submitting, disabled, hint,
   showPasswordToggle = false, memoryKey,
 }: VKInputProps) {
-  const { openKeyboard, isOpen } = useKeyboard();
+  const { openKeyboard, isOpen, settings } = useKeyboard();
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   const onSubmitRef = useRef(onSubmit);
@@ -92,61 +92,87 @@ export default function VKInput({
           {label}{required && <span className="text-red-400 ml-0.5">*</span>}
         </label>
       )}
-      <div
-        className={`
-          relative flex items-start gap-2 cursor-pointer select-none
-          transition-all rounded-xl border
-          ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-          ${active ? "border-blue-500 ring-2 ring-blue-400/40 shadow-[0_0_0_1px_rgba(59,130,246,0.2)]" : ""}
-          ${inputClassName || "px-3 py-2.5 bg-slate-50 border-slate-200"}
-        `}
-        onPointerDown={e => {
-          if (disabled) return;
-          tapRef.current = { x: e.clientX, y: e.clientY };
-        }}
-        onPointerUp={e => {
-          if (disabled || !tapRef.current) return;
-          const dx = Math.abs(e.clientX - tapRef.current.x);
-          const dy = Math.abs(e.clientY - tapRef.current.y);
-          tapRef.current = null;
-          if (dx < 10 && dy < 10) handleTap();
-        }}
-        onPointerCancel={() => { tapRef.current = null; }}
-        role="textbox"
-        aria-placeholder={placeholder}
-      >
-        {icon && (
-          <span className="shrink-0 mt-0.5 text-slate-400">{icon}</span>
-        )}
-        <div className={`flex-1 min-w-0 ${multiline ? "min-h-[" + (rows * 20) + "px]" : ""}`}>
-          {displayText ? (
-            <span className={`text-sm leading-relaxed break-words whitespace-pre-wrap ${isPasswordDisplay ? "tracking-widest" : ""}`}>
-              {displayText}
-              {active && (
-                <span className="border-r-2 border-blue-500 ml-px opacity-60 animate-pulse">&nbsp;</span>
-              )}
-            </span>
-          ) : (
-            <span className="text-sm text-slate-400">{placeholder}</span>
+
+      {settings.enabled ? (
+        /* ── In-app keyboard mode: tappable fake input ── */
+        <div
+          className={`
+            relative flex items-start gap-2 cursor-pointer select-none
+            transition-all rounded-xl border
+            ${disabled ? "opacity-50 cursor-not-allowed" : ""}
+            ${active ? "border-blue-500 ring-2 ring-blue-400/40 shadow-[0_0_0_1px_rgba(59,130,246,0.2)]" : ""}
+            ${inputClassName || "px-3 py-2.5 bg-slate-50 border-slate-200"}
+          `}
+          onPointerDown={e => {
+            if (disabled) return;
+            tapRef.current = { x: e.clientX, y: e.clientY };
+          }}
+          onPointerUp={e => {
+            if (disabled || !tapRef.current) return;
+            const dx = Math.abs(e.clientX - tapRef.current.x);
+            const dy = Math.abs(e.clientY - tapRef.current.y);
+            tapRef.current = null;
+            if (dx < 10 && dy < 10) handleTap();
+          }}
+          onPointerCancel={() => { tapRef.current = null; }}
+          role="textbox"
+          aria-placeholder={placeholder}
+        >
+          {icon && <span className="shrink-0 mt-0.5 text-slate-400">{icon}</span>}
+          <div className={`flex-1 min-w-0 ${multiline ? "min-h-[" + (rows * 20) + "px]" : ""}`}>
+            {displayText ? (
+              <span className={`text-sm leading-relaxed break-words whitespace-pre-wrap ${isPasswordDisplay ? "tracking-widest" : ""}`}>
+                {displayText}
+                {active && <span className="border-r-2 border-blue-500 ml-px opacity-60 animate-pulse">&nbsp;</span>}
+              </span>
+            ) : (
+              <span className="text-sm text-slate-400">{placeholder}</span>
+            )}
+          </div>
+          {showPasswordToggle && type === "password" && (
+            <button type="button"
+              onPointerDown={e => { e.stopPropagation(); e.preventDefault(); setShowPassword(s => !s); }}
+              className="shrink-0 mt-0.5 text-slate-400 hover:text-slate-600 transition-colors" tabIndex={-1}>
+              {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+            </button>
           )}
         </div>
+      ) : (
+        /* ── Native mode: real browser input / textarea ── */
+        <div className={`relative flex items-start gap-2 rounded-xl border transition-all ${disabled ? "opacity-50" : ""} ${inputClassName || "px-3 py-2.5 bg-slate-50 border-slate-200"}`}>
+          {icon && <span className="shrink-0 mt-0.5 text-slate-400">{icon}</span>}
+          {multiline ? (
+            <textarea
+              value={value}
+              onChange={e => onChange(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey && onSubmit) { e.preventDefault(); onSubmit(); } }}
+              placeholder={placeholder}
+              maxLength={maxLength}
+              disabled={disabled || submitting}
+              rows={rows}
+              className="flex-1 bg-transparent text-sm leading-relaxed outline-none resize-none placeholder:text-slate-400"
+            />
+          ) : (
+            <input
+              type={showPassword ? "text" : type}
+              value={value}
+              onChange={e => onChange(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && onSubmit) { e.preventDefault(); onSubmit(); } }}
+              placeholder={placeholder}
+              maxLength={maxLength}
+              disabled={disabled || submitting}
+              className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400 min-w-0"
+            />
+          )}
+          {showPasswordToggle && type === "password" && (
+            <button type="button" onClick={() => setShowPassword(s => !s)}
+              className="shrink-0 mt-0.5 text-slate-400 hover:text-slate-600 transition-colors" tabIndex={-1}>
+              {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+            </button>
+          )}
+        </div>
+      )}
 
-        {/* Eye toggle for password fields */}
-        {showPasswordToggle && type === "password" && (
-          <button
-            type="button"
-            onPointerDown={e => {
-              e.stopPropagation();
-              e.preventDefault();
-              setShowPassword(s => !s);
-            }}
-            className="shrink-0 mt-0.5 text-slate-400 hover:text-slate-600 transition-colors"
-            tabIndex={-1}
-          >
-            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
-        )}
-      </div>
       {hint && <p className="text-[10px] text-slate-400 ml-1">{hint}</p>}
     </div>
   );

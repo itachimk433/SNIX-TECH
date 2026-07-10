@@ -16,6 +16,7 @@ import AiTestPanel from "./AiTestPanel";
 // account — never surfaced to regular users. Not a security boundary (it's
 // a client-side check), just keeps it out of the normal product surface.
 const AI_TEST_PANEL_OWNER_EMAIL = "itachisasuke2339@gmail.com";
+const isNative = !!(window as any).Capacitor?.isNativePlatform?.();
 
 // Live countdown badge — ticks every second when < 24 h remain
 function ProfileExpiryBadge({ expiresAt }: { expiresAt?: number | null }) {
@@ -209,7 +210,8 @@ function BannerPickerModal({ currentUrl, onSelect, onClose }: {
   userUid?: string;
 }) {
   const { openKeyboard, settings: kbSettings } = useKeyboard();
-  const [tab, setTab]             = useState<"search" | "url" | "presets">("search");
+  // Default to Gradients on web — GIF search is APK-only
+  const [tab, setTab]             = useState<"search" | "url" | "presets">(isNative ? "search" : "presets");
   const [sourceIdx, setSourceIdx] = useState(0);
   const [query, setQuery]         = useState("anime landscape");
   const [inputUrl, setInputUrl]   = useState(currentUrl || "");
@@ -283,9 +285,16 @@ function BannerPickerModal({ currentUrl, onSelect, onClose }: {
 
         {/* Tabs */}
         <div className="flex px-5 gap-2 shrink-0 pb-3">
-          <button onClick={() => setTab("search")}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-colors ${tab === "search" ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-500"}`}
-          >🔍 GIFs</button>
+          {isNative ? (
+            <button onClick={() => setTab("search")}
+              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-colors ${tab === "search" ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-500"}`}
+            >🔍 GIFs</button>
+          ) : (
+            <div className="flex-1 py-2 text-xs font-bold rounded-xl bg-slate-50 text-slate-300 text-center border border-slate-100 relative">
+              🔍 GIFs
+              <span className="block text-[8px] font-semibold text-slate-300">APK only</span>
+            </div>
+          )}
           <button onClick={() => setTab("presets")}
             className={`flex-1 py-2 text-xs font-bold rounded-xl transition-colors ${tab === "presets" ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-500"}`}
           >🎨 Gradients</button>
@@ -693,7 +702,7 @@ export default function ProfileView({ userUid, onBackToFeed, isGuest = false, on
   bioTextRef.current = bioText;
   const nameTextRef = useRef(nameText);
   nameTextRef.current = nameText;
-  const { openKeyboard, closeKeyboard } = useKeyboard();
+  const { openKeyboard, closeKeyboard, settings: kbSettings } = useKeyboard();
 
   useEffect(() => {
     if (!isMe || !currentUser) return;
@@ -1240,16 +1249,30 @@ export default function ProfileView({ userUid, onBackToFeed, isGuest = false, on
             <div className="px-5 w-full flex flex-col items-center">
             {editingName ? (
               <div className="w-full px-4 mt-3 space-y-2">
-                <div
-                  className="w-full px-3 py-2 bg-slate-50 border border-blue-300 rounded-xl text-sm font-bold text-center min-h-[36px] leading-relaxed cursor-pointer select-none"
-                  style={{ fontFamily:"'Space Grotesk', sans-serif" }}
-                  onPointerDown={e => { e.preventDefault(); startNameEdit(); }}
-                >
-                  {nameText
-                    ? <>{nameText}<span className="border-r-2 border-blue-500 ml-px animate-pulse">&nbsp;</span></>
-                    : <span className="text-slate-400 font-normal italic text-xs">Tap to type your name...</span>
-                  }
-                </div>
+                {kbSettings.enabled ? (
+                  <div
+                    className="w-full px-3 py-2 bg-slate-50 border border-blue-300 rounded-xl text-sm font-bold text-center min-h-[36px] leading-relaxed cursor-pointer select-none"
+                    style={{ fontFamily:"'Space Grotesk', sans-serif" }}
+                    onPointerDown={e => { e.preventDefault(); startNameEdit(); }}
+                  >
+                    {nameText
+                      ? <>{nameText}<span className="border-r-2 border-blue-500 ml-px animate-pulse">&nbsp;</span></>
+                      : <span className="text-slate-400 font-normal italic text-xs">Tap to type your name...</span>
+                    }
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    value={nameText}
+                    onChange={e => { setNameText(e.target.value); nameTextRef.current = e.target.value; }}
+                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); saveName(); } }}
+                    placeholder="Your display name..."
+                    maxLength={30}
+                    autoFocus
+                    className="w-full px-3 py-2 bg-slate-50 border border-blue-300 rounded-xl text-sm font-bold text-center outline-none"
+                    style={{ fontFamily:"'Space Grotesk', sans-serif" }}
+                  />
+                )}
                 <div className="flex justify-center gap-1.5">
                   <button
                     onPointerDown={e => { e.preventDefault(); setEditingName(false); setNameText(profile.displayName||""); closeKeyboard(); }}
@@ -1287,16 +1310,30 @@ export default function ProfileView({ userUid, onBackToFeed, isGuest = false, on
             <div className="w-full mt-4 border-t border-b border-slate-100/80 py-3.5 px-1">
               {editingBio ? (
                 <div className="space-y-2">
-                  {/* Tappable display — opens in-app keyboard, never native keyboard */}
-                  <div
-                    className="w-full px-3 py-2 bg-slate-50 border border-blue-300 rounded-xl text-xs min-h-[48px] leading-relaxed break-words whitespace-pre-wrap cursor-pointer select-none"
-                    onPointerDown={e => { e.preventDefault(); startBioEdit(); }}
-                  >
-                    {bioText
-                      ? <>{bioText}<span className="border-r-2 border-blue-500 ml-px animate-pulse">&nbsp;</span></>
-                      : <span className="text-slate-400 italic">Tap to type your bio...</span>
-                    }
-                  </div>
+                  {kbSettings.enabled ? (
+                    /* Tappable display — opens in-app keyboard */
+                    <div
+                      className="w-full px-3 py-2 bg-slate-50 border border-blue-300 rounded-xl text-xs min-h-[48px] leading-relaxed break-words whitespace-pre-wrap cursor-pointer select-none"
+                      onPointerDown={e => { e.preventDefault(); startBioEdit(); }}
+                    >
+                      {bioText
+                        ? <>{bioText}<span className="border-r-2 border-blue-500 ml-px animate-pulse">&nbsp;</span></>
+                        : <span className="text-slate-400 italic">Tap to type your bio...</span>
+                      }
+                    </div>
+                  ) : (
+                    /* Native textarea */
+                    <textarea
+                      value={bioText}
+                      onChange={e => { setBioText(e.target.value); bioTextRef.current = e.target.value; }}
+                      onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); saveBio(); } }}
+                      placeholder="Write a short bio..."
+                      maxLength={80}
+                      rows={3}
+                      autoFocus
+                      className="w-full px-3 py-2 bg-slate-50 border border-blue-300 rounded-xl text-xs leading-relaxed outline-none resize-none"
+                    />
+                  )}
                   <div className="flex justify-end gap-1.5">
                     <button
                       onPointerDown={e => { e.preventDefault(); setEditingBio(false); setBioText(profile.bio||""); closeKeyboard(); }}

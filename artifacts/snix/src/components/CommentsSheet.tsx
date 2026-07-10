@@ -67,7 +67,7 @@ function CommentItem({
   const ref = useRef<HTMLDivElement>(null);
   const editTextRef = useRef(editText);
   editTextRef.current = editText;
-  const { openKeyboard, closeKeyboard } = useKeyboard();
+  const { openKeyboard, closeKeyboard, settings: kbSettings } = useKeyboard();
 
   // Scroll highlighted comment into view
   useEffect(() => {
@@ -124,26 +124,46 @@ function CommentItem({
           </div>
         )}
         {editing ? (
-          /* Compact editing indicator — the keyboard overlay above shows the text
-             and has submit/done buttons, so this stays slim and always visible. */
-          <div
-            className="bg-blue-50 rounded-2xl rounded-tl-sm px-3 py-2 border border-blue-200 flex items-center gap-2 cursor-pointer select-none"
-            onPointerDown={e => { e.preventDefault(); startEditing(); }}
-          >
-            <div className="flex-1 min-w-0">
-              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block mb-0.5">✏️ Editing</span>
-              <p className="text-xs text-blue-800 break-words line-clamp-2 leading-relaxed">
-                {editText || <span className="italic text-blue-400">Type in the keyboard below</span>}
-              </p>
+          kbSettings.enabled ? (
+            /* In-app keyboard: compact indicator, overlay handles the typing */
+            <div
+              className="bg-blue-50 rounded-2xl rounded-tl-sm px-3 py-2 border border-blue-200 flex items-center gap-2 cursor-pointer select-none"
+              onPointerDown={e => { e.preventDefault(); startEditing(); }}
+            >
+              <div className="flex-1 min-w-0">
+                <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block mb-0.5">✏️ Editing</span>
+                <p className="text-xs text-blue-800 break-words line-clamp-2 leading-relaxed">
+                  {editText || <span className="italic text-blue-400">Type in the keyboard below</span>}
+                </p>
+              </div>
+              <button
+                onPointerDown={e => { e.preventDefault(); e.stopPropagation(); setEditing(false); setEditText(comment.text); closeKeyboard(); }}
+                className="shrink-0 px-2.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-100 rounded-lg"
+              >Cancel</button>
             </div>
-            <button
-              onPointerDown={e => {
-                e.preventDefault(); e.stopPropagation();
-                setEditing(false); setEditText(comment.text); closeKeyboard();
-              }}
-              className="shrink-0 px-2.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-100 rounded-lg"
-            >Cancel</button>
-          </div>
+          ) : (
+            /* Native keyboard: inline textarea */
+            <div className="space-y-2">
+              <textarea
+                value={editText}
+                onChange={e => { setEditText(e.target.value); editTextRef.current = e.target.value; }}
+                placeholder="Edit your comment..."
+                maxLength={500}
+                rows={3}
+                autoFocus
+                className="w-full px-3 py-2 bg-blue-50 border border-blue-200 rounded-2xl rounded-tl-sm text-xs leading-relaxed outline-none resize-none"
+              />
+              <div className="flex gap-1.5 justify-end">
+                <button onPointerDown={e => { e.preventDefault(); e.stopPropagation(); setEditing(false); setEditText(comment.text); }}
+                  className="px-2.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-100 rounded-lg">Cancel</button>
+                <button onPointerDown={e => { e.preventDefault(); e.stopPropagation(); saveEdit(); }}
+                  disabled={saving}
+                  className="px-2.5 py-1 text-[10px] font-bold text-white bg-blue-600 rounded-lg disabled:opacity-50">
+                  {saving ? 'Saving…' : 'Save'}
+                </button>
+              </div>
+            </div>
+          )
         ) : (
           <>
             <div
@@ -601,29 +621,54 @@ export default function CommentsSheet({ postId, isGuest, onSignInRequired, onClo
           </div>
         )}
 
-        {/* Virtual keyboard */}
+        {/* Virtual keyboard / native compose */}
         {showVK && !isGuest && (
-          <div className="shrink-0 border-t border-slate-200">
-            {error && <p className="text-[11px] text-red-500 font-medium px-4 pt-2 text-center">{error}</p>}
-            <VirtualKeyboard
-              value={text}
-              onChange={setText}
-              onSubmit={handleSubmit}
-              placeholder={replyingTo?`Reply to @${replyingTo.name}...`:"Write a comment..."}
-              maxLength={500}
-              submitting={submitting}
-              replyBanner={replyBanner}
-              isMultiline={true}
-              theme={settings.theme}
-              height={settings.height}
-            />
-            <div className="px-3 pb-2 flex justify-end" style={{ background: settings.theme==="dark"?"#1e293b":settings.theme==="blue"?"#1e3a5f":"white" }}>
-              <button onClick={()=>setShowVK(false)}
-                className={`text-[10px] font-semibold px-3 py-1 rounded-lg ${settings.theme==="dark"||settings.theme==="blue"?"text-slate-300":"text-slate-400"}`}>
-                Hide keyboard
-              </button>
+          settings.enabled ? (
+            <div className="shrink-0 border-t border-slate-200">
+              {error && <p className="text-[11px] text-red-500 font-medium px-4 pt-2 text-center">{error}</p>}
+              <VirtualKeyboard
+                value={text}
+                onChange={setText}
+                onSubmit={handleSubmit}
+                placeholder={replyingTo?`Reply to @${replyingTo.name}...`:"Write a comment..."}
+                maxLength={500}
+                submitting={submitting}
+                replyBanner={replyBanner}
+                isMultiline={true}
+                theme={settings.theme}
+                height={settings.height}
+              />
+              <div className="px-3 pb-2 flex justify-end" style={{ background: settings.theme==="dark"?"#1e293b":settings.theme==="blue"?"#1e3a5f":"white" }}>
+                <button onClick={()=>setShowVK(false)}
+                  className={`text-[10px] font-semibold px-3 py-1 rounded-lg ${settings.theme==="dark"||settings.theme==="blue"?"text-slate-300":"text-slate-400"}`}>
+                  Hide keyboard
+                </button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="shrink-0 border-t border-slate-100 px-4 pb-4 pt-3 space-y-2 bg-white">
+              {replyBanner}
+              {error && <p className="text-[11px] text-red-500 font-medium text-center">{error}</p>}
+              <textarea
+                value={text}
+                onChange={e => setText(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
+                placeholder={replyingTo ? `Reply to @${replyingTo.name}...` : "Write a comment..."}
+                maxLength={500}
+                rows={3}
+                autoFocus
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs leading-relaxed outline-none resize-none"
+              />
+              <div className="flex justify-between items-center">
+                <button onClick={() => { setShowVK(false); setReplyingTo(null); }}
+                  className="text-xs text-slate-400 font-medium px-1">Cancel</button>
+                <button onClick={handleSubmit} disabled={submitting || !text.trim()}
+                  className="px-4 py-2 bg-slate-950 text-white text-xs font-bold rounded-xl disabled:opacity-40">
+                  {submitting ? 'Sending…' : 'Send'}
+                </button>
+              </div>
+            </div>
+          )
         )}
       </div>
     </div>
