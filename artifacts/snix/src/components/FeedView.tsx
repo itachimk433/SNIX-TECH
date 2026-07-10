@@ -7,6 +7,7 @@ import { VPNPost, VPN_APPS_LIST, PostReaction, COUNTRIES } from "../types";
 import { Search, Download, Copy, Layers, Sparkles, Eye, EyeOff, Cloud, FileCode, LogIn, Clock, CheckCircle, MessageCircle, Trash2, Globe, RefreshCw, UserCheck, Trophy, Flag, X } from "lucide-react";
 import { notifyRefreshed } from "../utils/feedback";
 import LeaderboardModal from "./LeaderboardModal";
+import AskSnixModal from "./AskSnixModal";
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -281,6 +282,7 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
   const [commentPostId, setCommentPostId] = useState<string | null>(null);
   const [copiedCountedIds, setCopiedCountedIds] = useState<Set<string>>(new Set());
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showSnixAi, setShowSnixAi] = useState(false);
   const [myCountry, setMyCountry] = useState<string | undefined>(undefined);
   // Live copy of the signed-in user's own avatar, always sourced fresh from
   // Firestore rather than each post's denormalized `authorAvatar` field —
@@ -869,6 +871,8 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
         />
       )}
 
+      {showSnixAi && <AskSnixModal onClose={() => setShowSnixAi(false)} isGuest={isGuest} uid={auth.currentUser?.uid ?? null} />}
+
       {commentPostId && (
         <CommentsSheet
           postId={commentPostId}
@@ -987,6 +991,12 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
                 <Trophy size={20} />
               </div>
               <span className="text-[9px] font-black text-amber-600 uppercase tracking-wider">Ranks</span>
+            </button>
+            <button onClick={() => setShowSnixAi(true)} className="flex flex-col items-center gap-0.5 active:scale-95 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-emerald-500 flex items-center justify-center text-white">
+                <Sparkles size={20} />
+              </div>
+              <span className="text-[9px] font-black text-blue-600 uppercase tracking-wider">SNIX-AI</span>
             </button>
             <button onClick={onAboutPress} className="flex flex-col items-center gap-0.5 active:scale-95 transition-transform">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-emerald-500 flex items-center justify-center text-white">
