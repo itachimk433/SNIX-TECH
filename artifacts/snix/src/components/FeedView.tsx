@@ -172,7 +172,7 @@ function getCloudUrl(postId: string) {
   return `${base}/api/configs/${postId}/raw`;
 }
 
-function GuestPrompt({ action, onSignIn }: { action: string; onSignIn: () => void }) {
+export function GuestPrompt({ action, onSignIn }: { action: string; onSignIn: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onSignIn}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />

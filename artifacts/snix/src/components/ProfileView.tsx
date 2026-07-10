@@ -1029,7 +1029,7 @@ export default function ProfileView({ userUid, onBackToFeed, isGuest = false, on
       )}
       {showFollowers && <UserListModal title="Followers" uids={followerUids} onClose={()=>setShowFollowers(false)} onUserClick={uid=>{ setShowFollowers(false); setViewUid(uid); }} />}
       {showFollowing && <UserListModal title="Following" uids={followingUids} onClose={()=>setShowFollowing(false)} onUserClick={uid=>{ setShowFollowing(false); setViewUid(uid); }} />}
-      {showAskSnix && <AskSnixModal onClose={() => setShowAskSnix(false)} />}
+      {showAskSnix && <AskSnixModal onClose={() => setShowAskSnix(false)} isGuest={isGuest} uid={auth.currentUser?.uid ?? null} />}
       {showAiTest && currentUser?.email === AI_TEST_PANEL_OWNER_EMAIL && <AiTestPanel onClose={() => setShowAiTest(false)} />}
 
       {showNotifications && (

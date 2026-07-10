@@ -9,7 +9,7 @@ import { initPushNotifications } from "./utils/pushNotifications";
 import PhoneContainer from "./components/PhoneContainer";
 import BottomNav, { TabType } from "./components/BottomNav";
 import AuthView from "./components/AuthView";
-import FeedView from "./components/FeedView";
+import FeedView, { GuestPrompt } from "./components/FeedView";
 import CreatePostView from "./components/CreatePostView";
 import ProfileView from "./components/ProfileView";
 import { Mail, WifiOff, RefreshCw, X, Keyboard, Maximize2, Palette, MapPin, MailCheck, ArrowRight } from "lucide-react";
@@ -155,10 +155,11 @@ const HEIGHTS: { value: KBHeight; label: string; sub: string }[] = [
   { value: "tall",    label: "Tall",    sub: "Large keys"  },
 ];
 
-function SettingsModal({ onClose }: { onClose: () => void }) {
+function SettingsModal({ onClose, isGuest, onSignInRequired }: { onClose: () => void; isGuest: boolean; onSignInRequired: () => void }) {
   const { settings, updateSettings } = useKeyboard();
   const [country, setCountry] = useState<string>("");
   const [countrySaving, setCountrySaving] = useState(false);
+  const [showGuestPrompt, setShowGuestPrompt] = useState(false);
 
   const handleCountryChange = async (code: string) => {
     const uid = auth.currentUser?.uid;
@@ -284,16 +285,25 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
                 <div className="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center"><MapPin size={16} className="text-emerald-600" /></div>
                 <div className="text-left flex-1 min-w-0">
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Country {countrySaving && "· saving…"}</p>
-                  <select
-                    value={country}
-                    onChange={e => handleCountryChange(e.target.value)}
-                    className="w-full mt-0.5 bg-transparent text-xs font-bold text-slate-800 outline-none"
-                  >
-                    <option value="">Not set — used for local leaderboard</option>
-                    {COUNTRIES.map(c => (
-                      <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
-                    ))}
-                  </select>
+                  {isGuest ? (
+                    <button
+                      onClick={() => setShowGuestPrompt(true)}
+                      className="w-full mt-0.5 text-left bg-transparent text-xs font-bold text-slate-400 outline-none"
+                    >
+                      Sign in to set your country
+                    </button>
+                  ) : (
+                    <select
+                      value={country}
+                      onChange={e => handleCountryChange(e.target.value)}
+                      className="w-full mt-0.5 bg-transparent text-xs font-bold text-slate-800 outline-none"
+                    >
+                      <option value="">Not set — used for local leaderboard</option>
+                      {COUNTRIES.map(c => (
+                        <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </div>
             </div>
@@ -347,6 +357,9 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
           <button onClick={onClose} className="w-full py-3 bg-slate-950 text-white font-bold rounded-xl text-xs tracking-wider uppercase">Close</button>
         </div>
       </div>
+      {showGuestPrompt && (
+        <GuestPrompt action="Set Your Country" onSignIn={() => { setShowGuestPrompt(false); onClose(); onSignInRequired(); }} />
+      )}
     </div>
   );
 }
@@ -606,7 +619,7 @@ function AppInner() {
       )}
 
       {showSettings && (
-        <SettingsModal onClose={() => setShowSettings(false)} />
+        <SettingsModal onClose={() => setShowSettings(false)} isGuest={isGuest} onSignInRequired={handleSignInRequired} />
       )}
 
       {showExitConfirm && (
