@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, getRedirectResult, User } from "firebase/auth";
 import { auth, db, isFirebaseConfigured } from "./firebase";
 import { doc, getDoc, setDoc, onSnapshot, collection, query, where } from "firebase/firestore";
 import { App as CapApp } from "@capacitor/app";
@@ -486,6 +486,13 @@ function AppInner() {
         .catch(() => {});
     }
 
+    // On web: process any pending Google redirect result (from signInWithRedirect).
+    // Firebase fires onAuthStateChanged with the user after processing — this
+    // call just ensures the redirect result is consumed on page load.
+    if (!Capacitor.isNativePlatform()) {
+      getRedirectResult(auth).catch(() => {});
+    }
+
     const unsub = onAuthStateChanged(auth, async firebaseUser => {
       if (nullTimer) { clearTimeout(nullTimer); nullTimer = null; }
 
@@ -520,8 +527,13 @@ function AppInner() {
         } catch {}
         initPushNotifications().catch(() => {});
       } else {
-        // Wait 900 ms before treating null as "not logged in" — Firebase may
-        // fire a second callback with the persisted session from IndexedDB.
+        // Always clear user state immediately on sign-out or session expiry so
+        // the UI transitions back to AuthView right away (resolved may already
+        // be true if this fires after the initial auth check completed).
+        setUser(null);
+        setIsGuest(false);
+        // Still delay finish() on the INITIAL null — Firebase may fire a second
+        // callback with the persisted IndexedDB session shortly after.
         nullTimer = setTimeout(finish, 900);
       }
     });

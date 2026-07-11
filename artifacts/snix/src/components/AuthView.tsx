@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { auth, db } from "../firebase";
 import {
   signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile,
-  GoogleAuthProvider, signInWithPopup, signInWithCredential,
+  GoogleAuthProvider, signInWithPopup, signInWithRedirect, signInWithCredential,
   sendEmailVerification,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
@@ -82,14 +82,12 @@ export default function AuthView({ onAuthSuccess, onNewAccountCreated, onGuestCo
         });
         return; // loading state cleared by finally below
       } else {
+        // Mobile browsers block popups. Use redirect flow — Firebase fires
+        // onAuthStateChanged with the signed-in user when the page resumes.
         const provider = new GoogleAuthProvider();
-        const userCred = await signInWithPopup(auth, provider);
-        ensureUserProfile(
-          userCred.user.uid,
-          userCred.user.displayName || "Agent",
-          userCred.user.email || "",
-        ).catch(() => {});
-        onAuthSuccess();
+        await signInWithRedirect(auth, provider);
+        // Page is navigating away; loading state stays until redirect returns.
+        return;
       }
     } catch (err: any) {
       const code = err?.code || "";
@@ -103,6 +101,8 @@ export default function AuthView({ onAuthSuccess, onNewAccountCreated, onGuestCo
         );
       } else if (code === "auth/network-request-failed") {
         setError("No internet connection. Please check your Wi-Fi or mobile data.");
+      } else if (code === "auth/argument-error" || code === "auth/invalid-api-key") {
+        setError("Google Sign-In setup is incomplete. Please sign in with Email/Password instead.");
       } else {
         setError(msg || "Google Sign-In failed.");
       }
@@ -123,11 +123,12 @@ export default function AuthView({ onAuthSuccess, onNewAccountCreated, onGuestCo
 
   const handleSubmit = async () => {
     setError(""); setLoading(true);
-    if (!email || !password || (!isLogin && !displayName)) {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !password || (!isLogin && !displayName)) {
       setError("Please fill out all required fields."); setLoading(false); return;
     }
     // Email length limit applies to new accounts only
-    if (!isLogin && email.length > 50) {
+    if (!isLogin && trimmedEmail.length > 50) {
       setError("Email address must be 50 characters or fewer."); setLoading(false); return;
     }
     // Password complexity rules only for new accounts
@@ -140,7 +141,7 @@ export default function AuthView({ onAuthSuccess, onNewAccountCreated, onGuestCo
     }
     try {
       if (isLogin) {
-        const loginCred = await signInWithEmailAndPassword(auth, email, password);
+        const loginCred = await signInWithEmailAndPassword(auth, trimmedEmail, password);
         // If this email/password account was never verified, re-show the
         // verification screen instead of letting the user straight into the app.
         if (!loginCred.user.emailVerified) {
@@ -150,10 +151,10 @@ export default function AuthView({ onAuthSuccess, onNewAccountCreated, onGuestCo
           onAuthSuccess();
         }
       } else {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const cred = await createUserWithEmailAndPassword(auth, trimmedEmail, password);
         await updateProfile(cred.user, { displayName });
         await setDoc(doc(db, "users", cred.user.uid), {
-          uid: cred.user.uid, displayName, email,
+          uid: cred.user.uid, displayName, email: trimmedEmail,
           bio: bio || "VPN Configuration Curator & Secure Net enthusiast.",
           avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(displayName)}`,
           createdAt: Date.now(), followerCount: 0, followingCount: 0,
@@ -176,6 +177,8 @@ export default function AuthView({ onAuthSuccess, onNewAccountCreated, onGuestCo
         setError("Please enter a valid email address.");
       else if (code === "auth/operation-not-allowed")
         setError("Email/Password sign-in is not enabled. Contact support.");
+      else if (code === "auth/argument-error")
+        setError("Please enter a valid email address and password.");
       else if (code === "auth/network-request-failed")
         setError("No internet connection. Please check your Wi-Fi or mobile data.");
       else if (code === "auth/too-many-requests")
