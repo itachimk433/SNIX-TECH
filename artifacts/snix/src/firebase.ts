@@ -4,7 +4,7 @@ import {
   getFirestore,
   memoryLocalCache,
 } from "firebase/firestore";
-import { getAuth, initializeAuth, indexedDBLocalPersistence, browserLocalPersistence } from "firebase/auth";
+import { getAuth, initializeAuth, indexedDBLocalPersistence, browserLocalPersistence, browserPopupRedirectResolver } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyCNf0irsu8Vm3rxwAKLwMS_B_847eUDSww",
@@ -32,6 +32,9 @@ export const auth = (() => {
   try {
     return initializeAuth(app, {
       persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+      // Required when using custom initializeAuth — without this, signInWithPopup
+      // and signInWithRedirect both throw auth/argument-error.
+      popupRedirectResolver: browserPopupRedirectResolver,
     });
   } catch {
     // Already initialized

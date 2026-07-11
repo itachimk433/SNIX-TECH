@@ -82,12 +82,23 @@ export default function AuthView({ onAuthSuccess, onNewAccountCreated, onGuestCo
         });
         return; // loading state cleared by finally below
       } else {
-        // Mobile browsers block popups. Use redirect flow — Firebase fires
-        // onAuthStateChanged with the signed-in user when the page resumes.
         const provider = new GoogleAuthProvider();
-        await signInWithRedirect(auth, provider);
-        // Page is navigating away; loading state stays until redirect returns.
-        return;
+        try {
+          const userCred = await signInWithPopup(auth, provider);
+          ensureUserProfile(
+            userCred.user.uid,
+            userCred.user.displayName || "Agent",
+            userCred.user.email || "",
+          ).catch(() => {});
+          onAuthSuccess();
+        } catch (popupErr: any) {
+          // If Chrome blocks the popup, fall back to redirect flow.
+          if (popupErr?.code === "auth/popup-blocked") {
+            await signInWithRedirect(auth, provider);
+            return; // page is navigating away
+          }
+          throw popupErr; // re-throw so outer catch handles it
+        }
       }
     } catch (err: any) {
       const code = err?.code || "";
