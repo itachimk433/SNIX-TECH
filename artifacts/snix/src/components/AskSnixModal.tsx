@@ -1,57 +1,21 @@
 /**
  * AskSnixModal — in-app SNIX-AI help assistant.
  *
- * Supports Gemini (via VITE_GEMINI_API_KEY) and OpenAI (via VITE_OPENAI_API_KEY).
- * The user can switch models from within the chat header.
- *
  * Features:
- *  - SNIX-AI(beta) label in header
- *  - Model / provider selector (Gemini & OpenAI, persisted to localStorage)
+ *  - SNIX-AI(beta) label + beta disclaimer note
  *  - Resend button on failed messages
  *  - Conversation persistence across modal open/close (localStorage)
  *  - Guest reply limit (5 replies) with sign-in prompt
  *  - Limited creator disclosure by default
  */
 import React, { useState, useRef, useEffect } from "react";
-import { X, Send, Sparkles, RotateCcw, ChevronDown, Check } from "lucide-react";
+import { X, Send, Sparkles, RotateCcw } from "lucide-react";
 import { useKeyboard } from "../context/KeyboardContext";
 
 interface ChatMsg { role: "user" | "model"; text: string; failed?: boolean }
 
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
-const OPENAI_KEY = import.meta.env.VITE_OPENAI_API_KEY as string | undefined;
-
-// ── Model catalogue ─────────────────────────────────────────────────────────
-type Provider = "gemini" | "openai";
-interface ModelOption { id: string; label: string; provider: Provider; badge?: string }
-
-const GEMINI_MODELS: ModelOption[] = [
-  { id: "gemini-2.5-flash",      label: "Gemini 2.5 Flash",      provider: "gemini", badge: "default" },
-  { id: "gemini-2.5-pro",        label: "Gemini 2.5 Pro",        provider: "gemini", badge: "smart"   },
-  { id: "gemini-2.0-flash-lite", label: "Gemini 2.0 Flash Lite", provider: "gemini", badge: "fast"    },
-];
-
-const OPENAI_MODELS: ModelOption[] = [
-  { id: "gpt-4o-mini", label: "GPT-4o Mini", provider: "openai", badge: "fast"  },
-  { id: "gpt-4o",      label: "GPT-4o",      provider: "openai", badge: "smart" },
-];
-
-const ALL_MODELS: ModelOption[] = [
-  ...(GEMINI_KEY ? GEMINI_MODELS : []),
-  ...(OPENAI_KEY ? OPENAI_MODELS : []),
-];
-
-const DEFAULT_MODEL_ID = GEMINI_KEY ? "gemini-2.5-flash" : OPENAI_KEY ? "gpt-4o-mini" : "";
-const MODEL_STORAGE_KEY = "snix-ai-model";
-
-function loadModelId(): string {
-  try {
-    const saved = localStorage.getItem(MODEL_STORAGE_KEY);
-    if (saved && ALL_MODELS.some(m => m.id === saved)) return saved;
-  } catch {}
-  return DEFAULT_MODEL_ID;
-}
-function saveModelId(id: string) { try { localStorage.setItem(MODEL_STORAGE_KEY, id); } catch {} }
+const MODEL_ID   = "gemini-2.5-flash";
 
 // ── Guest limits ─────────────────────────────────────────────────────────────
 const GUEST_REPLY_LIMIT = 5;
@@ -123,46 +87,16 @@ const DECLINE =
 const GREETING = "Hi! I'm SNIX-AI — I can help you find your way around the app. What do you need help with?";
 
 // ── AI call ───────────────────────────────────────────────────────────────────
-async function askAI(message: string, history: ChatMsg[], modelId: string): Promise<string> {
+async function askAI(message: string, history: ChatMsg[]): Promise<string> {
   if (isBlocked(message)) return DECLINE;
-
-  const model = ALL_MODELS.find(m => m.id === modelId);
-
-  if (model?.provider === "openai") {
-    if (!OPENAI_KEY) throw new Error("OpenAI key not configured.");
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${OPENAI_KEY}` },
-      body: JSON.stringify({
-        model: modelId,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...history.map(h => ({ role: h.role === "model" ? "assistant" : "user", content: h.text })),
-          { role: "user", content: message },
-        ],
-        temperature: 0.4,
-        max_tokens: 700,
-      }),
-    });
-    const j = await res.json().catch(() => null) as any;
-    if (!res.ok) {
-      const msg = j?.error?.message || `OpenAI error (HTTP ${res.status})`;
-      if (res.status === 429) throw new Error("You're sending messages too fast — try again in a moment.");
-      throw new Error(msg);
-    }
-    const reply = (j?.choices?.[0]?.message?.content as string | undefined)?.trim();
-    if (!reply) throw new Error("No reply received.");
-    return reply;
-  }
-
-  // Default → Gemini
   if (!GEMINI_KEY) throw new Error("SNIX-AI is not configured yet.");
+
   const contents = [
     ...history.map(h => ({ role: h.role, parts: [{ text: h.text }] })),
     { role: "user", parts: [{ text: message }] },
   ];
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_KEY },
@@ -178,7 +112,7 @@ async function askAI(message: string, history: ChatMsg[], modelId: string): Prom
     error?: { message?: string };
   } | null;
   if (!res.ok) {
-    const msg = j?.error?.message || `Gemini error (HTTP ${res.status})`;
+    const msg = j?.error?.message || `Error (HTTP ${res.status})`;
     if (res.status === 429) throw new Error("You're sending messages too fast — try again in a moment.");
     throw new Error(msg);
   }
@@ -186,13 +120,6 @@ async function askAI(message: string, history: ChatMsg[], modelId: string): Prom
   if (!reply) throw new Error("No reply received.");
   return reply;
 }
-
-// ── Badge colours ─────────────────────────────────────────────────────────────
-const BADGE_CLASSES: Record<string, string> = {
-  default: "bg-blue-100 text-blue-700",
-  smart:   "bg-purple-100 text-purple-700",
-  fast:    "bg-emerald-100 text-emerald-700",
-};
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
@@ -208,10 +135,6 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
   const [error, setError]       = useState<string | null>(null);
   const scrollRef               = useRef<HTMLDivElement>(null);
 
-  // Model selection
-  const [modelId, setModelId]               = useState<string>(loadModelId);
-  const [showModelPicker, setShowModelPicker] = useState(false);
-
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, sending]);
@@ -220,8 +143,6 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
 
   const guestRepliesUsed  = isGuest ? messages.filter(m => m.role === "model" && !m.failed).length - 1 : 0;
   const guestLimitReached = isGuest && guestRepliesUsed >= GUEST_REPLY_LIMIT;
-
-  const currentModel = ALL_MODELS.find(m => m.id === modelId) || ALL_MODELS[0];
 
   const send = async (text: string, historyOverride?: ChatMsg[]) => {
     const trimmed = text.trim();
@@ -233,7 +154,7 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
     setInput("");
     setSending(true);
     try {
-      const reply = await askAI(trimmed, history, modelId);
+      const reply = await askAI(trimmed, history);
       setMessages(m => [...m, { role: "model", text: reply }]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -247,12 +168,6 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
     const trimmedHistory = messages.slice(0, index);
     setMessages(trimmedHistory);
     send(msg.text, trimmedHistory);
-  };
-
-  const selectModel = (id: string) => {
-    setModelId(id);
-    saveModelId(id);
-    setShowModelPicker(false);
   };
 
   return (
@@ -272,24 +187,6 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
               </p>
               <p className="text-[10px] text-slate-400 font-medium">App help &amp; troubleshooting</p>
             </div>
-
-            {/* Model picker pill */}
-            {ALL_MODELS.length > 0 && (
-              <button
-                onClick={() => setShowModelPicker(p => !p)}
-                className="ml-1 shrink-0 flex items-center gap-1 pl-2 pr-1.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors"
-              >
-                <span className="text-[10px] font-bold text-slate-600 max-w-[90px] truncate">
-                  {currentModel?.label ?? modelId}
-                </span>
-                {currentModel?.badge && (
-                  <span className={`text-[8px] font-bold px-1 py-0.5 rounded-md ${BADGE_CLASSES[currentModel.badge] ?? "bg-slate-200 text-slate-600"}`}>
-                    {currentModel.badge}
-                  </span>
-                )}
-                <ChevronDown size={11} className="text-slate-400 shrink-0" />
-              </button>
-            )}
           </div>
 
           <button onClick={onClose} className="ml-2 p-1.5 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors shrink-0">
@@ -297,56 +194,13 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
           </button>
         </div>
 
-        {/* Model picker dropdown */}
-        {showModelPicker && (
-          <div className="shrink-0 border-b border-slate-100 bg-slate-50 px-4 py-3">
-            {GEMINI_KEY && GEMINI_MODELS.length > 0 && (
-              <>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Google Gemini</p>
-                <div className="space-y-1 mb-3">
-                  {GEMINI_MODELS.map(m => (
-                    <button key={m.id} onClick={() => selectModel(m.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition-colors ${modelId === m.id ? "bg-blue-600 text-white" : "bg-white hover:bg-slate-100 text-slate-700 border border-slate-100"}`}>
-                      <span className="text-xs font-semibold">{m.label}</span>
-                      <div className="flex items-center gap-1.5">
-                        {m.badge && (
-                          <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-md ${modelId === m.id ? "bg-white/20 text-white" : BADGE_CLASSES[m.badge] ?? ""}`}>
-                            {m.badge}
-                          </span>
-                        )}
-                        {modelId === m.id && <Check size={13} />}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-            {OPENAI_KEY && OPENAI_MODELS.length > 0 && (
-              <>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">OpenAI</p>
-                <div className="space-y-1">
-                  {OPENAI_MODELS.map(m => (
-                    <button key={m.id} onClick={() => selectModel(m.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition-colors ${modelId === m.id ? "bg-blue-600 text-white" : "bg-white hover:bg-slate-100 text-slate-700 border border-slate-100"}`}>
-                      <span className="text-xs font-semibold">{m.label}</span>
-                      <div className="flex items-center gap-1.5">
-                        {m.badge && (
-                          <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-md ${modelId === m.id ? "bg-white/20 text-white" : BADGE_CLASSES[m.badge] ?? ""}`}>
-                            {m.badge}
-                          </span>
-                        )}
-                        {modelId === m.id && <Check size={13} />}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-            {ALL_MODELS.length === 0 && (
-              <p className="text-xs text-slate-400 text-center py-2">No AI keys configured.</p>
-            )}
-          </div>
-        )}
+        {/* Beta disclaimer */}
+        <div className="shrink-0 px-4 pt-2.5 pb-0">
+          <p className="text-[10px] font-semibold text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-1.5 leading-relaxed">
+            ⚠️ SNIX-AI is in early beta — answers may sometimes be incomplete or inaccurate. For urgent help, email{" "}
+            <span className="font-bold">mkdev4360@gmail.com</span>.
+          </p>
+        </div>
 
         {/* Messages */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">

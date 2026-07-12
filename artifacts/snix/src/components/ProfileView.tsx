@@ -4,13 +4,14 @@ import { collection, query, where, onSnapshot, doc, setDoc, deleteDoc, updateDoc
 
 import { deleteUser } from "firebase/auth";
 import { VPNPost, UserProfile, Notification, PostReaction } from "../types";
-import { UserPlus, UserCheck, LogOut, FolderLock, Calendar, ArrowLeft, Cloud, X, Users, Trash2, Camera, Bell, ThumbsUp, Reply, MessageCircle, UserCheck2, Pencil, Clock, AlertTriangle, RefreshCw, Zap, Sparkles, FlaskConical } from "lucide-react";
+import { UserPlus, UserCheck, LogOut, FolderLock, Calendar, ArrowLeft, Cloud, X, Users, Trash2, Camera, Bell, ThumbsUp, Reply, MessageCircle, UserCheck2, Pencil, Clock, AlertTriangle, RefreshCw, Zap, Sparkles, FlaskConical, Flag } from "lucide-react";
 import { useKeyboard } from "../context/KeyboardContext";
 import LinkText from "./LinkText";
 import { triggerPushNotification } from "../utils/notify";
 import { notifyRefreshed } from "../utils/feedback";
 import AskSnixModal from "./AskSnixModal";
 import AiTestPanel from "./AiTestPanel";
+import AdminReportsView from "./AdminReportsView";
 
 // Dev-only AI testing panel (bring-your-own-key) is only ever shown to this
 // account — never surfaced to regular users. Not a security boundary (it's
@@ -651,6 +652,7 @@ export default function ProfileView({ userUid, onBackToFeed, isGuest = false, on
   const [reactedLoading, setReactedLoading] = useState(false);
   const [showAskSnix, setShowAskSnix] = useState(false);
   const [showAiTest, setShowAiTest] = useState(false);
+  const [showAdminReports, setShowAdminReports] = useState(false);
 
   // Pull-to-refresh — mirrors the FeedView implementation so profile data
   // (own or someone else's) can be manually refreshed the same way.
@@ -1063,6 +1065,7 @@ export default function ProfileView({ userUid, onBackToFeed, isGuest = false, on
       {showFollowing && <UserListModal title="Following" uids={followingUids} onClose={()=>setShowFollowing(false)} onUserClick={uid=>{ setShowFollowing(false); setViewUid(uid); }} />}
       {showAskSnix && <AskSnixModal onClose={() => setShowAskSnix(false)} isGuest={isGuest} uid={auth.currentUser?.uid ?? null} />}
       {showAiTest && currentUser?.email === AI_TEST_PANEL_OWNER_EMAIL && <AiTestPanel onClose={() => setShowAiTest(false)} />}
+      {showAdminReports && currentUser?.email === AI_TEST_PANEL_OWNER_EMAIL && <AdminReportsView onClose={() => setShowAdminReports(false)} />}
 
       {showNotifications && (
         <NotificationsPanel
@@ -1145,6 +1148,13 @@ export default function ProfileView({ userUid, onBackToFeed, isGuest = false, on
               className="p-2 hover:bg-slate-100 text-slate-500 rounded-xl transition-all"
               title="AI Test Panel">
               <FlaskConical size={18} />
+            </button>
+          )}
+          {isMe && currentUser?.email === AI_TEST_PANEL_OWNER_EMAIL && (
+            <button onClick={() => setShowAdminReports(true)}
+              className="p-2 hover:bg-slate-100 text-red-400 rounded-xl transition-all relative"
+              title="Reported Posts">
+              <Flag size={18} />
             </button>
           )}
           {isMe && (
