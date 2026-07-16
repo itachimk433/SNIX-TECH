@@ -109,7 +109,13 @@ function CommentItem({
   };
 
   return (
-    <div ref={ref} className={`flex items-start gap-2.5 transition-all duration-500 ${isReply ? "ml-9 pl-2.5 border-l-2" style={{ borderColor: "#1E3A5F" }} : ""} ${highlighted ? "rounded-2xl p-1" style={{ boxShadow: "0 0 0 2px rgba(0,212,255,0.4)", backgroundColor: "rgba(0,212,255,0.05)" }} : ""}`}>
+    <div ref={ref}
+      className={`flex items-start gap-2.5 transition-all duration-500 ${isReply ? "ml-9 pl-2.5 border-l-2" : ""} ${highlighted ? "rounded-2xl p-1" : ""}`}
+      style={{
+        ...(isReply ? { borderColor: "#1E3A5F" } : {}),
+        ...(highlighted ? { boxShadow: "0 0 0 2px rgba(0,212,255,0.4)", backgroundColor: "rgba(0,212,255,0.05)" } : {}),
+      }}
+    >
       <img
         src={comment.authorAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${comment.userId}`}
         alt={comment.authorName}
