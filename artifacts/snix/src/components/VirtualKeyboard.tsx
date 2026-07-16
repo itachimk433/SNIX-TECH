@@ -181,7 +181,7 @@ const THEMES: Record<KBTheme, ThemeConf> = {
     toolbarBtn: "bg-white border border-slate-200 text-slate-600 active:bg-slate-100",
     histCardBg: "bg-white border border-slate-200",
     histCardText: "text-slate-700",
-    suggBg: "bg-white", suggBorder: "border-slate-200", suggText: "text-slate-700",
+    suggBg: "" style={{ backgroundColor: "#111B2A", border: "1px solid #1E3A5F", color: "#E8F4F8" }},
     suggActiveBg: "bg-blue-50 border-blue-300 text-blue-700",
   },
   dark: {

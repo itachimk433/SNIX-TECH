@@ -53,7 +53,7 @@ export default function PurchaseProModal({ onClose, onSuccess }: PurchaseProModa
     <div className="fixed inset-0 z-[500] flex items-end justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className="relative w-full bg-white rounded-t-3xl shadow-2xl flex flex-col max-h-[90vh]"
+        className="relative w-full rounded-t-3xl flex flex-col overflow-hidden" style={{ backgroundColor: "#0D1520", borderTop: "2px solid #00D4FF", boxShadow: "0 -8px 40px rgba(0,212,255,0.12)" }}
         onClick={e => e.stopPropagation()}
       >
         {/* Drag handle */}

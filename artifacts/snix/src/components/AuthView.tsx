@@ -199,32 +199,32 @@ export default function AuthView({ onAuthSuccess, onNewAccountCreated, onGuestCo
     } finally { setLoading(false); }
   };
 
-  const commonInputCls   = "w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm";
-  const passwordInputCls = "w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm";
+  const commonInputCls   = "w-full pl-9 pr-4 py-2.5 rounded-xl text-sm" as any;
+  const passwordInputCls = "w-full pl-9 pr-10 py-2.5 rounded-xl text-sm" as any;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50">
+    <div className="flex-1 overflow-y-auto">
       <div className="min-h-full flex flex-col justify-center px-6 py-10">
 
         <div className="flex flex-col items-center mb-8 text-center">
           <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-xl mb-4">
             <img src={snixIcon} alt="SNIX" className="w-full h-full object-cover" />
           </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>SNIX</h1>
-          <p className="text-xs text-slate-500 mt-2 max-w-[280px]">The Decentralized VPN Configuration Hub & Community</p>
+          <h1 className="text-4xl font-extrabold tracking-tight" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#E8F4F8", textShadow: "0 0 20px rgba(0,212,255,0.5)", letterSpacing: "6px" }}>SNIX</h1>
+          <p className="text-xs mt-2 max-w-[280px]" style={{ color: "#3A5A78", fontFamily: "'JetBrains Mono', monospace" }}>The Decentralized VPN Configuration Hub & Community</p>
         </div>
 
-        <div className="flex border-b border-slate-200 mb-4 bg-white p-1 rounded-xl shadow-sm">
+        <div className="flex mb-4 p-1 rounded-xl" style={{ backgroundColor: "#0D1520", border: "1px solid #1E3A5F" }}>
           <button type="button" onClick={() => { setIsLogin(true); setError(""); setConfirmPassword(""); }}
             className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all ${isLogin ? "bg-slate-950 text-white shadow-sm" : "text-slate-500"}`}>Sign In</button>
           <button type="button" onClick={() => { setIsLogin(false); setError(""); setConfirmPassword(""); }}
             className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all ${!isLogin ? "bg-slate-950 text-white shadow-sm" : "text-slate-500"}`}>Create Account</button>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow-xl border border-slate-100/80">
+        <div className="p-5 rounded-2xl">
           <div className="space-y-3.5">
             {error && (
-              <div className="p-3 bg-red-50 text-red-600 rounded-xl text-xs font-medium flex items-start gap-2 border border-red-100">
+              <div className="p-3 rounded-xl text-xs font-medium flex items-start gap-2" style={{ backgroundColor: "rgba(255,56,96,0.12)", color: "#FF3860", border: "1px solid rgba(255,56,96,0.3)" }}>
                 <span className="font-bold shrink-0">Error:</span>
                 <span className="break-all">{error}</span>
               </div>
@@ -327,7 +327,7 @@ export default function AuthView({ onAuthSuccess, onNewAccountCreated, onGuestCo
               type="button"
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full py-3 bg-slate-950 text-white font-bold rounded-xl text-sm tracking-wider uppercase shadow-md hover:bg-slate-900 flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full py-3 font-bold rounded-xl text-sm tracking-wider uppercase flex items-center justify-center gap-2 disabled:opacity-60" style={{ background: "linear-gradient(90deg, #00A8CC, #00D4FF)", color: "#040709", fontFamily: "'JetBrains Mono', monospace", boxShadow: "0 0 20px rgba(0,212,255,0.25)" }}
             >
               {loading
                 ? <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
@@ -339,28 +339,28 @@ export default function AuthView({ onAuthSuccess, onNewAccountCreated, onGuestCo
         <div className="mt-4">
           <div className="relative flex py-2 items-center mb-3">
             <div className="flex-grow border-t border-slate-200" />
-            <span className="flex-shrink mx-3 text-slate-400 text-[9px] tracking-widest uppercase">or</span>
+            <span className="flex-shrink mx-3 text-[9px] tracking-widest uppercase" style={{ color: "#3A5A78", fontFamily: "'JetBrains Mono', monospace" }}>or</span>
             <div className="flex-grow border-t border-slate-200" />
           </div>
           <button
             type="button"
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
-            className="w-full py-3 bg-white text-slate-700 font-bold rounded-xl text-xs tracking-wider uppercase border border-slate-200 shadow-sm flex items-center justify-center gap-2 mb-2.5 disabled:opacity-60"
+            className="w-full py-3 font-bold rounded-xl text-xs tracking-wider uppercase flex items-center justify-center gap-2 mb-2.5 disabled:opacity-60" style={{ backgroundColor: "#111B2A", color: "#E8F4F8", border: "1px solid #1E3A5F", fontFamily: "'JetBrains Mono', monospace" }}
           >
             {googleLoading
               ? <span className="animate-spin rounded-full h-4 w-4 border-2 border-slate-400 border-t-transparent" />
               : <><FcGoogle size={16} /> Continue with Google</>}
           </button>
           <button type="button" onClick={onGuestContinue}
-            className="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-xl text-xs tracking-wider uppercase border border-slate-200 flex items-center justify-center gap-2 transition-all">
+            className="w-full py-3 font-bold rounded-xl text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-all" style={{ backgroundColor: "#0D1520", color: "#7A9BB5", border: "1px solid #1E3A5F", fontFamily: "'JetBrains Mono', monospace" }}>
             <Ghost size={14} /> Continue as Guest
           </button>
-          <p className="text-[10px] text-center text-slate-400 mt-2">
+          <p className="text-[10px] text-center mt-2" style={{ color: "#3A5A78" }}>
             Guests can browse, copy, and download configs — sign in to react, post, and comment.
           </p>
         </div>
-        <p className="text-[10px] text-center text-slate-400 mt-5">By connecting, you agree to SNIX secure config sharing norms.</p>
+        <p className="text-[10px] text-center mt-5" style={{ color: "#3A5A78" }}>By connecting, you agree to SNIX secure config sharing norms.</p>
       </div>
     </div>
   );

@@ -30,14 +30,14 @@ export default function CreatePostView({ onSuccess, isGuest, onSignInRequired }:
 
   if (isGuest) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center px-6 bg-slate-50 gap-5 text-center">
-        <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400"><LogIn size={28} /></div>
+      <div className="flex-1 flex flex-col items-center justify-center px-6 gap-5 text-center" style={{ backgroundColor: "#080C10" }}>
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#111B2A", border: "1px solid #1E3A5F", color: "#00D4FF" }}><LogIn size={28} /></div>
         <div>
           <h3 className="text-lg font-black text-slate-900">Sign In to Post</h3>
           <p className="text-xs text-slate-500 mt-2 leading-relaxed max-w-[240px] mx-auto">Create a free account to share VPN configurations with the SNIX community.</p>
         </div>
         <button onClick={onSignInRequired}
-          className="w-full max-w-[280px] py-3 bg-gradient-to-r from-blue-600 to-emerald-500 text-white font-bold rounded-xl text-xs tracking-wider uppercase shadow-md">
+          className="w-full max-w-[280px] py-3 font-bold rounded-xl text-xs tracking-wider uppercase" style={{ background: "linear-gradient(90deg, #00A8CC, #00D4FF)", color: "#040709", fontFamily: "'JetBrains Mono', monospace", boxShadow: "0 0 20px rgba(0,212,255,0.25)" }}>
           Sign In / Create Account
         </button>
       </div>
@@ -417,7 +417,7 @@ export default function CreatePostView({ onSuccess, isGuest, onSignInRequired }:
         </div>
 
         <button type="submit" disabled={loading}
-          className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-emerald-500 text-white font-bold rounded-xl text-xs tracking-wider uppercase shadow-md flex items-center justify-center gap-2">
+          className="w-full py-3 font-bold rounded-xl text-sm tracking-wider uppercase flex items-center justify-center gap-2 disabled:opacity-60" style={{ background: "linear-gradient(90deg, #00A8CC, #00D4FF)", color: "#040709", fontFamily: "'JetBrains Mono', monospace", boxShadow: "0 0 20px rgba(0,212,255,0.25)" }}>
           {loading ? <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> : (sharingMode === 'cloud_link' ? "Post Cloud Link" : "Post Configuration")}
         </button>
       </form>

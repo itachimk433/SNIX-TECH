@@ -168,7 +168,7 @@ export default function LeaderboardModal({ onClose, onAuthorClick, currentUserCo
       <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
         <div
-          className="relative w-full bg-white rounded-t-3xl p-6 shadow-2xl"
+          className="relative w-full rounded-t-3xl flex flex-col overflow-hidden" style={{ backgroundColor: "#0D1520", borderTop: "2px solid #00D4FF", maxHeight: "82vh", boxShadow: "0 -8px 40px rgba(0,212,255,0.12)" }}
           onClick={e => e.stopPropagation()}
         >
           <div className="flex flex-col items-center gap-4 text-center">
@@ -217,11 +217,11 @@ export default function LeaderboardModal({ onClose, onAuthorClick, currentUserCo
         <div className="flex px-5 gap-2 shrink-0 pb-3">
           <button
             onClick={() => handleScopeChange("global")}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 ${scope === "global" ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-500"}`}
+            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 ${scope === "global" ? "" style={{ backgroundColor: "#00D4FF", color: "#040709" }} : "bg-slate-100 text-slate-500"}`}
           ><Globe2 size={13} /> Global</button>
           <button
             onClick={() => handleScopeChange("local")}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 ${scope === "local" ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-500"}`}
+            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 ${scope === "local" ? "" style={{ backgroundColor: "#00D4FF", color: "#040709" }} : "bg-slate-100 text-slate-500"}`}
           ><MapPin size={13} /> National{countryMeta ? ` ${countryMeta.flag}` : ""}</button>
         </div>
 

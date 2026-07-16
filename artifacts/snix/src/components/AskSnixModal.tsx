@@ -173,30 +173,30 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-h-[82vh] bg-white rounded-t-3xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="relative w-full max-h-[82vh] rounded-t-3xl shadow-2xl flex flex-col overflow-hidden" style={{ backgroundColor: "#0D1520", borderTop: "2px solid #00D4FF", boxShadow: "0 -8px 40px rgba(0,212,255,0.12), 0 -4px 20px rgba(0,0,0,0.6)" }}>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 shrink-0" style={{ borderBottom: "1px solid #1E3A5F" }}>
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center text-white">
+            <div className="w-9 h-9 shrink-0 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #00A8CC, #00D4FF)", color: "#040709" }}>
               <Sparkles size={16} />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-black text-slate-900" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
-                SNIX-AI<span className="text-slate-400 font-bold">(beta)</span>
+              <p className="text-sm font-black" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#E8F4F8", letterSpacing: "1px" }}>
+                SNIX-AI<span className="font-bold" style={{ color: "#3A5A78" }}>(beta)</span>
               </p>
-              <p className="text-[10px] text-slate-400 font-medium">App help &amp; troubleshooting</p>
+              <p className="text-[10px] font-medium" style={{ color: "#3A5A78" }}>App help &amp; troubleshooting</p>
             </div>
           </div>
 
-          <button onClick={onClose} className="ml-2 p-1.5 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors shrink-0">
+          <button onClick={onClose} className="ml-2 p-1.5 rounded-full transition-colors shrink-0" style={{ color: "#3A5A78" }}>
             <X size={18} />
           </button>
         </div>
 
         {/* Beta disclaimer */}
         <div className="shrink-0 px-4 pt-2.5 pb-0">
-          <p className="text-[10px] font-semibold text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-1.5 leading-relaxed">
+          <p className="text-[10px] font-semibold rounded-lg px-3 py-1.5 leading-relaxed" style={{ backgroundColor: "rgba(255,56,96,0.10)", color: "#FF3860", border: "1px solid rgba(255,56,96,0.25)" }}>
             ⚠️ SNIX-AI is in early beta — answers may sometimes be incomplete or inaccurate. For urgent help, email{" "}
             <span className="font-bold">mkdev4360@gmail.com</span>.
           </p>
@@ -208,8 +208,8 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
             <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
               <div className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap ${
                 m.role === "user"
-                  ? `text-white rounded-br-md ${m.failed ? "bg-red-400" : "bg-gradient-to-br from-blue-600 to-emerald-500"}`
-                  : "bg-slate-100 text-slate-800 rounded-bl-md"
+                  ? `rounded-br-md ${m.failed ? "" : ""}` 
+                  : "rounded-bl-md" style={{ backgroundColor: "#111B2A", color: "#E8F4F8", border: "1px solid #1E3A5F" }}
               }`}>
                 {m.text}
               </div>
@@ -223,10 +223,10 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
           ))}
           {sending && (
             <div className="flex justify-start">
-              <div className="bg-slate-100 text-slate-400 px-3.5 py-2.5 rounded-2xl rounded-bl-md text-xs flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" />
+              <div className="px-3.5 py-2.5 rounded-2xl rounded-bl-md text-xs flex items-center gap-1" style={{ backgroundColor: "#111B2A", color: "#7A9BB5", border: "1px solid #1E3A5F" }}>
+                <span className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:-0.3s]" style={{ backgroundColor: "#00D4FF" }} />
+                <span className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:-0.15s]" style={{ backgroundColor: "#00D4FF" }} />
+                <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: "#00D4FF" }} />
               </div>
             </div>
           )}
@@ -235,7 +235,7 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
             <div className="flex flex-col gap-1.5 pt-1">
               {SUGGESTIONS.map(s => (
                 <button key={s} onClick={() => send(s)}
-                  className="text-left text-[11px] font-semibold text-blue-600 bg-blue-50 border border-blue-100 rounded-xl px-3 py-2 hover:bg-blue-100 transition-colors">
+                  className="text-left text-[11px] font-semibold rounded-xl px-3 py-2 transition-colors" style={{ color: "#00D4FF", backgroundColor: "rgba(0,212,255,0.07)", border: "1px solid rgba(0,212,255,0.2)", fontFamily: "'JetBrains Mono', monospace" }}>
                   {s}
                 </button>
               ))}
@@ -251,10 +251,10 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
         </div>
 
         {/* Input bar */}
-        <div className="flex items-center gap-2 px-4 py-3 border-t border-slate-100 shrink-0">
+        <div className="flex items-center gap-2 px-4 py-3 shrink-0" style={{ borderTop: "1px solid #1E3A5F" }}>
           {kbSettings.enabled ? (
             <div
-              className={`flex-1 bg-slate-100 rounded-xl px-3.5 py-2.5 text-xs font-medium cursor-pointer select-none min-h-[38px] flex items-center ${(sending || guestLimitReached) ? "opacity-50 pointer-events-none" : ""}`}
+              className={`flex-1 rounded-xl px-3.5 py-2.5 text-xs font-medium cursor-pointer select-none min-h-[38px] flex items-center ${(sending || guestLimitReached) ? "opacity-50 pointer-events-none" : ""}`} style={{ backgroundColor: "#111B2A", border: "1px solid #1E3A5F", color: "#E8F4F8", fontFamily: "'JetBrains Mono', monospace" }}
               onPointerUp={() => !sending && !guestLimitReached && openKeyboard(input, {
                 onChange: (v) => { setInput(v); inputRef.current = v; },
                 onSubmit: () => send(inputRef.current),
@@ -262,10 +262,10 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
               })}
             >
               {guestLimitReached
-                ? <span className="text-slate-400">Sign in to keep chatting…</span>
+                ? <span style={{ color: "#3A5A78" }}>Sign in to keep chatting…</span>
                 : input
-                  ? <span className="text-slate-800 break-words">{input}</span>
-                  : <span className="text-slate-400">Ask about how SNIX works…</span>
+                  ? <span style={{ color: "#E8F4F8" }} className="break-words">{input}</span>
+                  : <span style={{ color: "#3A5A78" }}>Ask about how SNIX works…</span>
               }
             </div>
           ) : (
@@ -276,13 +276,13 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
               onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(inputRef.current); } }}
               placeholder={guestLimitReached ? "Sign in to keep chatting…" : "Ask about how SNIX works…"}
               disabled={sending || guestLimitReached}
-              className="flex-1 bg-slate-100 rounded-xl px-3.5 py-2.5 text-xs font-medium min-h-[38px] outline-none disabled:opacity-50 placeholder:text-slate-400"
+              className="flex-1 rounded-xl px-3.5 py-2.5 text-xs font-medium min-h-[38px] outline-none disabled:opacity-50" style={{ backgroundColor: "#111B2A", border: "1px solid #1E3A5F", color: "#E8F4F8", fontFamily: "'JetBrains Mono', monospace" }}
             />
           )}
           <button
             onPointerDown={e => { e.preventDefault(); send(inputRef.current); }}
             disabled={sending || !input.trim() || guestLimitReached}
-            className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 text-white flex items-center justify-center disabled:opacity-40 transition-opacity"
+            className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center disabled:opacity-40 transition-opacity" style={{ background: "linear-gradient(135deg, #00A8CC, #00D4FF)", color: "#040709" }}
           >
             <Send size={16} />
           </button>

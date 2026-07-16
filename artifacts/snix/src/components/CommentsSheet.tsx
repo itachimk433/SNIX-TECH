@@ -109,11 +109,11 @@ function CommentItem({
   };
 
   return (
-    <div ref={ref} className={`flex items-start gap-2.5 transition-all duration-500 ${isReply ? "ml-9 pl-2.5 border-l-2 border-slate-100" : ""} ${highlighted ? "ring-2 ring-blue-400/60 rounded-2xl p-1 bg-blue-50/40" : ""}`}>
+    <div ref={ref} className={`flex items-start gap-2.5 transition-all duration-500 ${isReply ? "ml-9 pl-2.5 border-l-2" style={{ borderColor: "#1E3A5F" }} : ""} ${highlighted ? "rounded-2xl p-1" style={{ boxShadow: "0 0 0 2px rgba(0,212,255,0.4)", backgroundColor: "rgba(0,212,255,0.05)" }} : ""}`}>
       <img
         src={comment.authorAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${comment.userId}`}
         alt={comment.authorName}
-        className="w-7 h-7 rounded-full border border-slate-200 bg-slate-50 shrink-0 mt-0.5 cursor-pointer active:opacity-70"
+        className="w-7 h-7 rounded-full shrink-0 mt-0.5 cursor-pointer active:opacity-70" style={{ border: "1px solid #1E3A5F", backgroundColor: "#111B2A" }}
         onClick={() => onAuthorClick?.(comment.userId)}
       />
       <div className="flex-1 min-w-0">

@@ -98,7 +98,7 @@ function AvatarPickerModal({ onSelect, onClose, userUid }: {
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
       <div className="relative w-full bg-white rounded-t-3xl shadow-2xl p-5 flex flex-col gap-4"
         onClick={e => e.stopPropagation()}>
-        <div className="w-10 h-1 bg-slate-200 rounded-full absolute top-2 left-1/2 -translate-x-1/2" />
+        <div className="w-10 h-1 rounded-full absolute top-2 left-1/2 -translate-x-1/2" style={{ backgroundColor: "#1E3A5F" }} />
         <div className="flex items-center justify-between mt-2">
           <h3 className="font-black text-slate-900 text-base" style={{ fontFamily:"'Space Grotesk', sans-serif" }}>Choose Avatar</h3>
           <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded-xl text-slate-400"><X size={18} /></button>
@@ -107,11 +107,11 @@ function AvatarPickerModal({ onSelect, onClose, userUid }: {
         {/* Tabs: Styles | Extra */}
         <div className="flex gap-2">
           <button onClick={() => setTab("styles")}
-            className={`flex-1 py-2 text-[11px] font-bold rounded-xl border transition-all ${tab === "styles" ? "bg-slate-950 text-white border-slate-950" : "bg-slate-50 text-slate-500 border-slate-200"}`}>
+            className={`flex-1 py-2 text-[11px] font-bold rounded-xl border transition-all ${tab === "styles" ? "" style={{ backgroundColor: "#00D4FF", color: "#040709", border: "1px solid #00A8CC" }} : "" style={{ backgroundColor: "#111B2A", color: "#7A9BB5", border: "1px solid #1E3A5F" }}}`}>
             🎨 Styles
           </button>
           <button onClick={() => setTab("extra")}
-            className={`flex-1 py-2 text-[11px] font-bold rounded-xl border transition-all ${tab === "extra" ? "bg-slate-950 text-white border-slate-950" : "bg-slate-50 text-slate-500 border-slate-200"}`}>
+            className={`flex-1 py-2 text-[11px] font-bold rounded-xl border transition-all ${tab === "extra" ? "" style={{ backgroundColor: "#00D4FF", color: "#040709", border: "1px solid #00A8CC" }} : "" style={{ backgroundColor: "#111B2A", color: "#7A9BB5", border: "1px solid #1E3A5F" }}}`}>
             ✨ Extra
           </button>
         </div>
@@ -137,8 +137,8 @@ function AvatarPickerModal({ onSelect, onClose, userUid }: {
               {AVATAR_STYLES.map(s => (
                 <button key={s} onClick={() => setStyle(s)}
                   className={`relative px-3 py-1.5 text-[10px] font-bold rounded-lg whitespace-nowrap border transition-all ${
-                    style === s ? "bg-slate-950 text-white border-slate-950"
-                    : "bg-slate-50 text-slate-500 border-slate-200"}`}>
+                    style === s ? "" style={{ backgroundColor: "#00D4FF", color: "#040709", border: "1px solid #00A8CC" }}
+                    : "" style={{ backgroundColor: "#111B2A", color: "#7A9BB5", border: "1px solid #1E3A5F" }}}`}>
                   {s}
                 </button>
               ))}
@@ -147,7 +147,7 @@ function AvatarPickerModal({ onSelect, onClose, userUid }: {
             <div className="grid grid-cols-5 gap-3">
               {avatars.map((url, i) => (
                 <button key={i} onClick={() => { onSelect(url); onClose(); }} className="flex flex-col items-center gap-1 group">
-                  <img src={url} alt={`avatar-${i}`} className="w-14 h-14 rounded-2xl border-2 border-slate-100 group-hover:border-blue-500 group-hover:scale-105 transition-all bg-slate-50" />
+                  <img src={url} alt={`avatar-${i}`} className="w-14 h-14 rounded-2xl border-2 border-slate-100 group-hover:border-cyan-400 group-hover:scale-105 transition-all bg-slate-50" />
                 </button>
               ))}
             </div>

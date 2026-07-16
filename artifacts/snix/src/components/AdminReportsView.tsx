@@ -44,9 +44,14 @@ function timeAgo(ms: number): string {
 }
 
 const STATUS_STYLES: Record<ReportStatus, string> = {
-  pending:   "bg-amber-100 text-amber-700",
-  resolved:  "bg-emerald-100 text-emerald-700",
-  dismissed: "bg-slate-100 text-slate-500",
+  pending:   "font-bold text-xs px-2 py-0.5 rounded-full" as any,
+  resolved:  "font-bold text-xs px-2 py-0.5 rounded-full" as any,
+  dismissed: "font-bold text-xs px-2 py-0.5 rounded-full" as any,
+};
+const STATUS_INLINE: Record<ReportStatus, React.CSSProperties> = {
+  pending:   { backgroundColor: "rgba(255,200,0,0.12)", color: "#FFD700", border: "1px solid rgba(255,200,0,0.3)" },
+  resolved:  { backgroundColor: "rgba(0,255,136,0.12)", color: "#00FF88", border: "1px solid rgba(0,255,136,0.3)" },
+  dismissed: { backgroundColor: "#111B2A", color: "#3A5A78", border: "1px solid #1E3A5F" },
 };
 
 export default function AdminReportsView({ onClose }: { onClose: () => void }) {

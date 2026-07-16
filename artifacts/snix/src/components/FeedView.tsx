@@ -186,7 +186,7 @@ export function GuestPrompt({ action, onSignIn }: { action: string; onSignIn: ()
             <h3 className="text-lg font-black text-slate-900">Sign In to {action}</h3>
             <p className="text-xs text-slate-500 mt-1 max-w-[240px] mx-auto">Create a free SNIX account to unlock all features.</p>
           </div>
-          <button onClick={onSignIn} className="w-full py-3 bg-gradient-to-r from-blue-600 to-emerald-500 text-white font-bold rounded-xl text-xs tracking-wider uppercase shadow-md">Sign In / Create Account</button>
+          <button onClick={onSignIn} className="w-full py-3 font-bold rounded-xl text-xs tracking-wider uppercase" style={{ background: "linear-gradient(90deg, #00A8CC, #00D4FF)", color: "#040709", fontFamily: "'JetBrains Mono', monospace", boxShadow: "0 0 20px rgba(0,212,255,0.25)" }}>Sign In / Create Account</button>
         </div>
       </div>
     </div>
@@ -1243,7 +1243,7 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
                         </div>
                       </div>
                       <button onClick={() => handleCopyCloudLink(post.id)}
-                        className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 shrink-0 ${copiedId===post.id?"bg-emerald-500 text-white":"bg-emerald-600/30 text-emerald-400 border border-emerald-500/20"}`}>
+                        className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 shrink-0 ${copiedId===post.id?"" style={{ backgroundColor: "#00CC70", color: "#040709" }}:"bg-emerald-600/30 text-emerald-400 border border-emerald-500/20"}`}>
                         <Cloud size={11} />{copiedId===post.id?"Copied!":/^https?:\/\//i.test(post.configContent||"")?"Copy Link":"Copy Code"}
                       </button>
                     </div>
@@ -1271,7 +1271,7 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
                     <div className="flex items-center gap-2 self-end sm:self-auto">
                       {post.sharingMode==="cloud_only" && (
                         <button onClick={() => handleCopyCloudLink(post.id)}
-                          className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 ${copiedId===post.id?"bg-emerald-500 text-white":"bg-emerald-600/30 text-emerald-400 border border-emerald-500/20"}`}>
+                          className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 ${copiedId===post.id?"" style={{ backgroundColor: "#00CC70", color: "#040709" }}:"bg-emerald-600/30 text-emerald-400 border border-emerald-500/20"}`}>
                           <Cloud size={11} />{copiedId===post.id?"Copied!":"Copy Link"}
                         </button>
                       )}
@@ -1298,16 +1298,16 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
                     <div className="mt-2.5 flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
                       {post.sharingMode==="cloud_only" && (
                         <button onClick={() => handleCopyCloudLink(post.id)}
-                          className={`px-2.5 py-1.5 rounded-md text-[9px] font-bold flex items-center gap-1 ${copiedId===post.id?"bg-emerald-500 text-white":"bg-slate-800 hover:bg-slate-700 text-emerald-300"}`}>
+                          className={`px-2.5 py-1.5 rounded-md text-[9px] font-bold flex items-center gap-1 ${copiedId===post.id?"" style={{ backgroundColor: "#00CC70", color: "#040709" }}:"bg-slate-800 hover:bg-slate-700 text-emerald-300"}`}>
                           <Cloud size={11} />{copiedId===post.id?"Copied!":"Copy Cloud Link"}
                         </button>
                       )}
                       {post.sharingMode!=="cloud_only" && (
                         <button onClick={() => handleDownload(post)} disabled={downloadingId === post.id}
                           className={`px-2.5 py-1.5 rounded-md text-[9px] font-bold flex items-center gap-1.5 transition-all min-w-[72px] justify-center
-                            ${downloadedId===post.id?"bg-emerald-500 text-white"
-                            :downloadingId===post.id?"bg-slate-700 text-slate-300"
-                            :"bg-slate-800 hover:bg-slate-700 text-slate-200"}`}>
+                            ${downloadedId===post.id?"" style={{ backgroundColor: "#00CC70", color: "#040709" }}
+                            :downloadingId===post.id?"" style={{ backgroundColor: "#111B2A", color: "#7A9BB5" }}
+                            :"" style={{ backgroundColor: "#0D1520", color: "#E8F4F8", border: "1px solid #1E3A5F" }}}`}>
                           {downloadingId===post.id
                             ? <><DownloadRing size={11} />Saving…</>
                             : downloadedId===post.id
@@ -1320,18 +1320,18 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
                 )}
               </div>
 
-              <div className="p-3 bg-slate-50 flex items-center justify-between border-t border-slate-100">
+              <div className="p-3 flex items-center justify-between" style={{ backgroundColor: "#0D1520", borderTop: "1px solid #1E3A5F" }}>
                 <div className="flex items-center gap-1.5">
                   {([['heart','❤️',hearts],['ok','👌',oks],['down','👎',downs]] as const).map(([type,emoji,count]) => (
                     <button key={type} onClick={() => handleReaction(post.id, type as 'heart'|'ok'|'down')}
-                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${myReaction===type?"bg-blue-100 text-blue-700 border border-blue-200 scale-105":"bg-white text-slate-500 border border-slate-200 hover:bg-slate-100"}`}>
+                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${myReaction===type?"scale-105" style={{ backgroundColor: "rgba(0,212,255,0.12)", color: "#00D4FF", border: "1px solid rgba(0,212,255,0.3)" }}:"" style={{ backgroundColor: "#111B2A", color: "#7A9BB5", border: "1px solid #1E3A5F" }}}`}>
                       <span>{emoji}</span><span className="text-[10px]">{count}</span>
                     </button>
                   ))}
                 </div>
                 <div className="flex items-center gap-1.5">
                   <button onClick={() => setCommentPostId(post.id)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 hover:bg-slate-100">
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold" style={{ backgroundColor: "#111B2A", color: "#7A9BB5", border: "1px solid #1E3A5F" }}>
                     <MessageCircle size={13} /><span className="text-[10px]">{commentCount}</span>
                   </button>
                   <button

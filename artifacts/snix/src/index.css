@@ -7,37 +7,201 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
-body {
-  font-family: var(--font-sans);
-  background-color: #f8fafc;
-  color: #0f172a;
+/* ═══════════════════════════════════════════════════════════════════════════
+   BLEACH-OST THEME — applied globally as the default theme
+   Palette inspired by the Bleach OST player aesthetic
+   bg:#080C10 | surface:#0D1520/#111B2A | border:#1E3A5F | accent:#00D4FF
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --bx-bg:          #080C10;
+  --bx-surface:     #0D1520;
+  --bx-surface2:    #111B2A;
+  --bx-border:      #1E3A5F;
+  --bx-cyan:        #00D4FF;
+  --bx-cyan-dim:    #00A8CC;
+  --bx-cyan-glow:   rgba(0,212,255,0.18);
+  --bx-cyan-glow2:  rgba(0,212,255,0.06);
+  --bx-text:        #E8F4F8;
+  --bx-text-dim:    #7A9BB5;
+  --bx-text-muted:  #3A5A78;
+  --bx-red:         #FF3860;
+  --bx-green:       #00FF88;
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+html, body, #root {
+  background-color: var(--bx-bg) !important;
+  color: var(--bx-text) !important;
+}
 
-/* ── Settings icon glow — only the SVG lines glow, NOT the button border ──── */
+/* Scanline overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
+  );
+  opacity: 0.4;
+}
+
+/* Ambient cyan drift */
+body::after {
+  content: '';
+  position: fixed; width: 700px; height: 700px;
+  top: -200px; left: -200px; z-index: 0; pointer-events: none;
+  background: radial-gradient(circle, rgba(0,212,255,0.04) 0%, transparent 70%);
+  animation: bx-drift 14s ease-in-out infinite alternate;
+}
+@keyframes bx-drift { 0% { transform: translate(0,0); } 100% { transform: translate(80px,60px); } }
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bx-border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bx-cyan-dim); }
+
+/* ── Tailwind background overrides ──────────────────────────────────────── */
+.bg-white               { background-color: var(--bx-surface)  !important; }
+.bg-slate-50            { background-color: var(--bx-bg)        !important; }
+.bg-slate-50\/50        { background-color: var(--bx-bg)        !important; }
+.bg-slate-100           { background-color: var(--bx-surface2)  !important; }
+.bg-slate-200           { background-color: #1E3A5F             !important; }
+.bg-slate-300           { background-color: #253D5E             !important; }
+.bg-slate-800           { background-color: var(--bx-surface)   !important; }
+.bg-slate-900           { background-color: var(--bx-bg)        !important; }
+.bg-slate-950           { background-color: #040709             !important; }
+.bg-gray-50             { background-color: var(--bx-bg)        !important; }
+.bg-gray-100            { background-color: var(--bx-surface2)  !important; }
+.bg-gray-200            { background-color: #1E3A5F             !important; }
+
+/* ── Tailwind text overrides ────────────────────────────────────────────── */
+.text-slate-900         { color: var(--bx-text)       !important; }
+.text-slate-800         { color: #C8E0EC              !important; }
+.text-slate-700         { color: var(--bx-text-dim)   !important; }
+.text-slate-600         { color: var(--bx-text-dim)   !important; }
+.text-slate-500         { color: var(--bx-text-muted) !important; }
+.text-slate-400         { color: var(--bx-text-muted) !important; }
+.text-gray-900          { color: var(--bx-text)       !important; }
+.text-gray-700          { color: var(--bx-text-dim)   !important; }
+.text-gray-500          { color: var(--bx-text-muted) !important; }
+
+/* ── Tailwind border overrides ──────────────────────────────────────────── */
+.border-slate-50        { border-color: var(--bx-surface2) !important; }
+.border-slate-100       { border-color: var(--bx-border)   !important; }
+.border-slate-200       { border-color: var(--bx-border)   !important; }
+.border-slate-300       { border-color: #25446A             !important; }
+.border-slate-700       { border-color: var(--bx-border)   !important; }
+.border-slate-800       { border-color: var(--bx-border)   !important; }
+.border-gray-200        { border-color: var(--bx-border)   !important; }
+
+/* ── Active/selected state: blue → cyan ─────────────────────────────────── */
+.text-blue-600          { color: var(--bx-cyan)     !important; }
+.text-blue-700          { color: var(--bx-cyan)     !important; }
+.text-blue-400          { color: var(--bx-cyan-dim) !important; }
+.bg-blue-100            { background-color: rgba(0,212,255,0.12) !important; }
+.border-blue-200        { border-color: rgba(0,212,255,0.35)     !important; }
+.ring-blue-400\/60      { --tw-ring-color: rgba(0,212,255,0.4)   !important; }
+.bg-blue-50\/40         { background-color: rgba(0,212,255,0.05) !important; }
+
+/* Gradient CTA buttons: blue→emerald becomes cyan→teal */
+.from-blue-600          { --tw-gradient-from: #00A8CC !important; }
+.to-emerald-500         { --tw-gradient-to:   #00D4FF !important; }
+.from-blue-500          { --tw-gradient-from: #00A8CC !important; }
+.to-emerald-400         { --tw-gradient-to:   #00D4FF !important; }
+
+/* ping dot */
+.bg-blue-500            { background-color: var(--bx-cyan)     !important; }
+.bg-blue-600            { background-color: var(--bx-cyan-dim) !important; }
+
+/* emerald success color — keep green vibe */
+.text-emerald-400       { color: var(--bx-green) !important; }
+.text-emerald-500       { color: var(--bx-green) !important; }
+.bg-emerald-500         { background-color: #00CC70 !important; }
+.bg-emerald-100         { background-color: rgba(0,255,136,0.10) !important; }
+.text-emerald-700       { color: var(--bx-green) !important; }
+.border-emerald-200     { border-color: rgba(0,255,136,0.25) !important; }
+
+/* ── Input fields ───────────────────────────────────────────────────────── */
+input, textarea, select {
+  background-color: var(--bx-surface2) !important;
+  color: var(--bx-text) !important;
+  border-color: var(--bx-border) !important;
+}
+input::placeholder, textarea::placeholder { color: var(--bx-text-muted) !important; }
+input:focus, textarea:focus, select:focus {
+  border-color: var(--bx-cyan) !important;
+  box-shadow: 0 0 0 1px var(--bx-cyan), 0 0 16px var(--bx-cyan-glow) !important;
+  outline: none;
+}
+
+/* ── Card / sheet / modal surfaces ─────────────────────────────────────── */
+.shadow-2xl   { box-shadow: 0 25px 60px rgba(0,0,0,0.6) !important; }
+.shadow-lg    { box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; }
+.shadow-md    { box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important; }
+.shadow-sm    { box-shadow: 0 1px 6px rgba(0,0,0,0.35) !important; }
+
+/* Rounded-t sheet backdrop */
+.rounded-t-3xl {
+  background-color: var(--bx-surface) !important;
+  border-top: 2px solid var(--bx-cyan) !important;
+}
+.rounded-3xl  { background-color: var(--bx-surface) !important; }
+
+/* ── Bottom nav ─────────────────────────────────────────────────────────── */
+.border-t.border-slate-200 { border-color: var(--bx-border) !important; }
+
+/* ── Dividers ───────────────────────────────────────────────────────────── */
+.border-t   { border-color: var(--bx-border) !important; }
+.border-b   { border-color: var(--bx-border) !important; }
+.border-l-2 { border-color: var(--bx-border) !important; }
+
+/* ── Backdrop blur ──────────────────────────────────────────────────────── */
+.backdrop-blur-sm  { backdrop-filter: blur(8px); }
+.backdrop-blur-md  { backdrop-filter: blur(12px); }
+
+/* ── Buttons base ───────────────────────────────────────────────────────── */
+button { transition: all 0.18s ease; }
+
+/* Ghost / secondary buttons */
+.bg-slate-100 button, button.bg-slate-100 {
+  background-color: var(--bx-surface2) !important;
+  color: var(--bx-text-dim) !important;
+  border-color: var(--bx-border) !important;
+}
+
+/* Hover states */
+.hover\:bg-slate-100:hover  { background-color: var(--bx-surface2) !important; }
+.hover\:bg-slate-900:hover  { background-color: var(--bx-surface)  !important; }
+.hover\:bg-slate-700:hover  { background-color: var(--bx-surface2) !important; }
+.active\:bg-slate-200:active { background-color: #1E3A5F !important; }
+
+/* Focus ring */
+.ring-2 { --tw-ring-color: var(--bx-cyan); }
+
+/* ── Typography ─────────────────────────────────────────────────────────── */
+.font-mono, [class*="font-mono"] { font-family: 'JetBrains Mono', monospace !important; }
+
+/* ── Existing animations ─────────────────────────────────────────────────── */
 @keyframes snix-icon-glow {
   0%, 100% {
-    filter: drop-shadow(0 0 2px rgba(255,255,255,0.9))
-            drop-shadow(0 0 4px rgba(255,255,255,0.6));
+    filter: drop-shadow(0 0 2px rgba(0,212,255,0.9))
+            drop-shadow(0 0 4px rgba(0,212,255,0.6));
   }
   50% {
-    filter: drop-shadow(0 0 5px rgba(255,255,255,1.0))
-            drop-shadow(0 0 10px rgba(255,255,255,0.8))
-            drop-shadow(0 0 18px rgba(147,197,253,0.7));
+    filter: drop-shadow(0 0 5px rgba(0,212,255,1.0))
+            drop-shadow(0 0 10px rgba(0,212,255,0.8))
+            drop-shadow(0 0 18px rgba(0,212,255,0.7));
   }
 }
 .snix-icon-glow { animation: snix-icon-glow 2s ease-in-out infinite; }
 
-/* ── Left-side vertical sync progress bar ──────────────────────────────────── */
 @keyframes snix-sync-fill {
-  0%   { height: 0%;   opacity: 1; }
-  70%  { height: 82%;  opacity: 1; }
-  85%  { height: 88%;  opacity: 1; }
-  100% { height: 88%;  opacity: 1; } /* holds here until JS switches to complete */
+  0%   { height: 0%;  opacity: 1; }
+  70%  { height: 82%; opacity: 1; }
+  85%  { height: 88%; opacity: 1; }
+  100% { height: 88%; opacity: 1; }
 }
 @keyframes snix-sync-complete {
   0%   { height: 88%;  opacity: 1; }
@@ -47,7 +211,6 @@ body {
 .snix-sync-filling  { animation: snix-sync-fill     0.55s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
 .snix-sync-complete { animation: snix-sync-complete  0.28s ease-out                           forwards; }
 
-/* ── Profile avatar entrance + ambient glow (own & others' profiles) ──────── */
 @keyframes snix-avatar-pop {
   0%   { transform: scale(0.85); opacity: 0; }
   60%  { transform: scale(1.05); opacity: 1; }
@@ -56,14 +219,11 @@ body {
 .snix-avatar-pop { animation: snix-avatar-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
 
 @keyframes snix-avatar-ring {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.35); }
-  50%      { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.35); }
+  50%      { box-shadow: 0 0 0 8px rgba(0,212,255,0); }
 }
 .snix-avatar-ring { animation: snix-avatar-ring 2.4s ease-in-out infinite; }
 
-/* snix-avatar-wiggle removed */
-
-/* ── Pro-star fireworks particles ───────────────────────────────────────── */
 @keyframes snix-firework-particle {
   0%   { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
   80%  { opacity: 0.6; }
@@ -71,12 +231,9 @@ body {
 }
 .snix-firework-particle { animation: snix-firework-particle var(--dur) var(--delay) ease-out forwards; }
 
-/* ── GIF save progress ring ─────────────────────────────────────────────── */
 @keyframes snix-gif-spin {
   to { stroke-dashoffset: 0; }
 }
-
-/* ── GIF success checkmark ──────────────────────────────────────────────── */
 @keyframes snix-gif-success-pop {
   0%   { transform: scale(0.5); opacity: 0; }
   60%  { transform: scale(1.1); opacity: 1; }
@@ -84,109 +241,120 @@ body {
 }
 .snix-gif-success-pop { animation: snix-gif-success-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
 
-/* ── "Jump to post" highlight — moving blue/green lines around the card ──── */
+/* ── "Jump to post" highlight — cyan/teal glow ──────────────────────────── */
 @keyframes snix-post-highlight-march {
   0%   { background-position: 0 0; }
   100% { background-position: 40px 0; }
 }
 @keyframes snix-post-highlight-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.25), 0 0 0 0 rgba(16,185,129,0.15); }
-  50%      { box-shadow: 0 0 18px 2px rgba(37,99,235,0.35), 0 0 28px 6px rgba(16,185,129,0.25); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.25), 0 0 0 0 rgba(0,255,136,0.15); }
+  50%       { box-shadow: 0 0 18px 2px rgba(0,212,255,0.35), 0 0 28px 6px rgba(0,255,136,0.25); }
 }
 .snix-post-highlight {
-  position: relative;
-  z-index: 1;
-  animation: snix-post-highlight-pulse 1.4s ease-in-out infinite;
+  position: relative; z-index: 1;
+  animation: snix-post-highlight-pulse 1.4s ease-in-out 3;
 }
-.snix-post-highlight::before {
+.snix-post-highlight::after {
   content: "";
-  position: absolute;
-  inset: -3px;
-  border-radius: 20px;
-  padding: 3px;
+  position: absolute; inset: -2px; border-radius: inherit; pointer-events: none;
   background: repeating-linear-gradient(
     90deg,
-    #2563eb 0px, #2563eb 10px,
-    #10b981 10px, #10b981 20px,
-    #2563eb 20px, #2563eb 30px,
-    #10b981 30px, #10b981 40px
+    rgba(0,212,255,0.5) 0px, rgba(0,212,255,0.5) 10px,
+    rgba(0,255,136,0.4) 10px, rgba(0,255,136,0.4) 20px,
+    transparent 20px, transparent 30px,
+    rgba(0,212,255,0.5) 30px, rgba(0,212,255,0.5) 40px
   );
-  background-size: 40px 100%;
-  animation: snix-post-highlight-march 0.9s linear infinite;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: -1;
+  background-size: 40px 2px;
+  background-repeat: repeat-x;
+  background-position: top left;
+  animation: snix-post-highlight-march 0.6s linear infinite;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════════
-   App-wide theme overrides — !important guarantees wins over Tailwind utilities.
-   bg-slate-50/50 uses a "/" which Tailwind escapes as "\/" in its class name.
-   ══════════════════════════════════════════════════════════════════════════════ */
+/* ── Cyan glow on active nav item ────────────────────────────────────────── */
+.snix-nav-active {
+  color: var(--bx-cyan) !important;
+  filter: drop-shadow(0 0 6px rgba(0,212,255,0.7));
+}
 
-/* ── DARK theme ───────────────────────────────────────────────────────────── */
+/* ── Card hover glow ─────────────────────────────────────────────────────── */
+.snix-card {
+  background: rgba(13,21,32,0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--bx-border);
+  border-top: 2px solid var(--bx-cyan);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.snix-card:hover {
+  border-color: rgba(0,212,255,0.5);
+  box-shadow: 0 0 24px var(--bx-cyan-glow);
+}
+
+/* ── Cyan button ─────────────────────────────────────────────────────────── */
+.snix-btn-cyan {
+  background: var(--bx-cyan);
+  color: var(--bx-bg);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  border: none;
+  box-shadow: 0 0 16px var(--bx-cyan-glow), 0 0 30px rgba(0,212,255,0.1);
+}
+.snix-btn-cyan:hover {
+  background: var(--bx-cyan-dim);
+  box-shadow: 0 0 24px var(--bx-cyan-glow), 0 0 50px rgba(0,212,255,0.2);
+}
+
+/* ── Legacy theme selectors — kept for backward compat ──────────────────── */
 html[data-app-theme="dark"],
 html[data-app-theme="dark"] body,
-html[data-app-theme="dark"] #root { background-color: #0a0f1a !important; color: #f1f5f9 !important; }
+html[data-app-theme="dark"] #root { background-color: var(--bx-bg) !important; color: var(--bx-text) !important; }
 
-html[data-app-theme="dark"] .bg-white           { background-color: #1e293b !important; }
-html[data-app-theme="dark"] .bg-slate-50        { background-color: #0f172a !important; }
-html[data-app-theme="dark"] .bg-slate-50\/50    { background-color: #0a0f1a !important; }
-html[data-app-theme="dark"] .bg-slate-100       { background-color: #1e293b !important; }
-html[data-app-theme="dark"] .bg-slate-200       { background-color: #334155 !important; }
-html[data-app-theme="dark"] .bg-gray-50         { background-color: #0f172a !important; }
-html[data-app-theme="dark"] .bg-gray-100        { background-color: #1e293b !important; }
-html[data-app-theme="dark"] .text-slate-900     { color: #f1f5f9 !important; }
-html[data-app-theme="dark"] .text-slate-800     { color: #e2e8f0 !important; }
-html[data-app-theme="dark"] .text-slate-700     { color: #cbd5e1 !important; }
-html[data-app-theme="dark"] .text-slate-600     { color: #94a3b8 !important; }
-html[data-app-theme="dark"] .text-slate-500     { color: #64748b !important; }
-html[data-app-theme="dark"] .text-slate-400     { color: #475569 !important; }
-html[data-app-theme="dark"] .border-slate-50    { border-color: #1e293b !important; }
-html[data-app-theme="dark"] .border-slate-100   { border-color: #334155 !important; }
-html[data-app-theme="dark"] .border-slate-200   { border-color: #475569 !important; }
+html[data-app-theme="dark"] .bg-white           { background-color: var(--bx-surface)  !important; }
+html[data-app-theme="dark"] .bg-slate-50        { background-color: var(--bx-bg)        !important; }
+html[data-app-theme="dark"] .bg-slate-100       { background-color: var(--bx-surface2)  !important; }
+html[data-app-theme="dark"] .bg-slate-200       { background-color: #1E3A5F             !important; }
+html[data-app-theme="dark"] .text-slate-900     { color: var(--bx-text)       !important; }
+html[data-app-theme="dark"] .text-slate-800     { color: #C8E0EC              !important; }
+html[data-app-theme="dark"] .text-slate-700     { color: var(--bx-text-dim)   !important; }
+html[data-app-theme="dark"] .text-slate-600     { color: var(--bx-text-dim)   !important; }
+html[data-app-theme="dark"] .text-slate-500     { color: var(--bx-text-muted) !important; }
+html[data-app-theme="dark"] .text-slate-400     { color: var(--bx-text-muted) !important; }
+html[data-app-theme="dark"] .border-slate-50    { border-color: var(--bx-surface2) !important; }
+html[data-app-theme="dark"] .border-slate-100   { border-color: var(--bx-border)   !important; }
+html[data-app-theme="dark"] .border-slate-200   { border-color: var(--bx-border)   !important; }
 
-/* ── BLUE (Ocean) theme ───────────────────────────────────────────────────── */
 html[data-app-theme="blue"],
 html[data-app-theme="blue"] body,
-html[data-app-theme="blue"] #root { background-color: #060f23 !important; color: #eff6ff !important; }
+html[data-app-theme="blue"] #root { background-color: var(--bx-bg) !important; color: var(--bx-text) !important; }
 
-html[data-app-theme="blue"] .bg-white           { background-color: #172554 !important; }
-html[data-app-theme="blue"] .bg-slate-50        { background-color: #0c1a3a !important; }
-html[data-app-theme="blue"] .bg-slate-50\/50    { background-color: #060f23 !important; }
-html[data-app-theme="blue"] .bg-slate-100       { background-color: #1e3a8a !important; }
-html[data-app-theme="blue"] .bg-slate-200       { background-color: #1d4ed8 !important; }
-html[data-app-theme="blue"] .bg-gray-50         { background-color: #0c1a3a !important; }
-html[data-app-theme="blue"] .bg-gray-100        { background-color: #1e3a8a !important; }
-html[data-app-theme="blue"] .text-slate-900     { color: #eff6ff !important; }
-html[data-app-theme="blue"] .text-slate-800     { color: #dbeafe !important; }
-html[data-app-theme="blue"] .text-slate-700     { color: #bfdbfe !important; }
-html[data-app-theme="blue"] .text-slate-600     { color: #93c5fd !important; }
-html[data-app-theme="blue"] .text-slate-500     { color: #60a5fa !important; }
-html[data-app-theme="blue"] .text-slate-400     { color: #3b82f6 !important; }
-html[data-app-theme="blue"] .border-slate-50    { border-color: #1e40af !important; }
-html[data-app-theme="blue"] .border-slate-100   { border-color: #1e40af !important; }
-html[data-app-theme="blue"] .border-slate-200   { border-color: #2563eb !important; }
+html[data-app-theme="blue"] .bg-white           { background-color: var(--bx-surface)  !important; }
+html[data-app-theme="blue"] .bg-slate-50        { background-color: var(--bx-bg)        !important; }
+html[data-app-theme="blue"] .bg-slate-100       { background-color: var(--bx-surface2)  !important; }
+html[data-app-theme="blue"] .bg-slate-200       { background-color: #1E3A5F             !important; }
+html[data-app-theme="blue"] .text-slate-900     { color: var(--bx-text)       !important; }
+html[data-app-theme="blue"] .text-slate-800     { color: #C8E0EC              !important; }
+html[data-app-theme="blue"] .text-slate-700     { color: var(--bx-text-dim)   !important; }
+html[data-app-theme="blue"] .text-slate-600     { color: var(--bx-text-dim)   !important; }
+html[data-app-theme="blue"] .text-slate-500     { color: var(--bx-text-muted) !important; }
+html[data-app-theme="blue"] .text-slate-400     { color: var(--bx-text-muted) !important; }
+html[data-app-theme="blue"] .border-slate-50    { border-color: var(--bx-surface2) !important; }
+html[data-app-theme="blue"] .border-slate-100   { border-color: var(--bx-border)   !important; }
+html[data-app-theme="blue"] .border-slate-200   { border-color: var(--bx-border)   !important; }
 
-/* ── NEON theme ───────────────────────────────────────────────────────────── */
 html[data-app-theme="neon"],
 html[data-app-theme="neon"] body,
-html[data-app-theme="neon"] #root { background-color: #0d0d1a !important; color: #e2e8f0 !important; }
+html[data-app-theme="neon"] #root { background-color: var(--bx-bg) !important; color: var(--bx-text) !important; }
 
-html[data-app-theme="neon"] .bg-white           { background-color: #151528 !important; }
-html[data-app-theme="neon"] .bg-slate-50        { background-color: #0f0f20 !important; }
-html[data-app-theme="neon"] .bg-slate-50\/50    { background-color: #0d0d1a !important; }
-html[data-app-theme="neon"] .bg-slate-100       { background-color: #1a1a30 !important; }
-html[data-app-theme="neon"] .bg-slate-200       { background-color: #252540 !important; }
-html[data-app-theme="neon"] .bg-gray-50         { background-color: #0f0f20 !important; }
-html[data-app-theme="neon"] .bg-gray-100        { background-color: #1a1a30 !important; }
-html[data-app-theme="neon"] .text-slate-900     { color: #e2e8f0 !important; }
-html[data-app-theme="neon"] .text-slate-800     { color: #cbd5e1 !important; }
-html[data-app-theme="neon"] .text-slate-700     { color: #a5b4fc !important; }
-html[data-app-theme="neon"] .text-slate-600     { color: #818cf8 !important; }
-html[data-app-theme="neon"] .text-slate-500     { color: #6366f1 !important; }
-html[data-app-theme="neon"] .text-slate-400     { color: #4f46e5 !important; }
-html[data-app-theme="neon"] .border-slate-50    { border-color: #2d2d50 !important; }
-html[data-app-theme="neon"] .border-slate-100   { border-color: #2d2d50 !important; }
-html[data-app-theme="neon"] .border-slate-200   { border-color: #3d3d70 !important; }
+html[data-app-theme="neon"] .bg-white           { background-color: var(--bx-surface)  !important; }
+html[data-app-theme="neon"] .bg-slate-50        { background-color: var(--bx-bg)        !important; }
+html[data-app-theme="neon"] .bg-slate-100       { background-color: var(--bx-surface2)  !important; }
+html[data-app-theme="neon"] .bg-slate-200       { background-color: #1E3A5F             !important; }
+html[data-app-theme="neon"] .text-slate-900     { color: var(--bx-text)       !important; }
+html[data-app-theme="neon"] .text-slate-800     { color: #C8E0EC              !important; }
+html[data-app-theme="neon"] .text-slate-700     { color: var(--bx-text-dim)   !important; }
+html[data-app-theme="neon"] .text-slate-600     { color: var(--bx-text-dim)   !important; }
+html[data-app-theme="neon"] .text-slate-500     { color: var(--bx-text-muted) !important; }
+html[data-app-theme="neon"] .text-slate-400     { color: var(--bx-text-muted) !important; }
+html[data-app-theme="neon"] .border-slate-50    { border-color: var(--bx-surface2) !important; }
+html[data-app-theme="neon"] .border-slate-100   { border-color: var(--bx-border)   !important; }
+html[data-app-theme="neon"] .border-slate-200   { border-color: var(--bx-border)   !important; }

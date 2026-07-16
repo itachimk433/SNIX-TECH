@@ -44,26 +44,26 @@ async function checkServerReachable(): Promise<boolean> {
 // ─── Static components ────────────────────────────────────────────────────────
 function FirebaseNotConfigured() {
   return (
-    <div style={{ display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"100vh",padding:"32px 24px",backgroundColor:"#f8fafc",fontFamily:"ui-sans-serif,system-ui,sans-serif",textAlign:"center" }}>
-      <div style={{ width:64,height:64,borderRadius:20,background:"linear-gradient(135deg,#2563eb,#10b981)",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20,fontSize:28,color:"white",fontWeight:900 }}>S</div>
-      <h2 style={{ color:"#0f172a",fontWeight:800,fontSize:18,margin:"0 0 10px" }}>Firebase Setup Required</h2>
-      <p style={{ color:"#475569",fontSize:13,lineHeight:1.7,maxWidth:300,margin:"0 0 20px" }}>Add Firebase credentials as GitHub Secrets and rebuild the APK.</p>
+    <div style={{ display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"100vh",padding:"32px 24px",backgroundColor:"#080C10",fontFamily:"ui-sans-serif,system-ui,sans-serif",textAlign:"center" }}>
+      <div style={{ width:64,height:64,borderRadius:20,background:"linear-gradient(135deg,#00A8CC,#00D4FF)",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20,fontSize:28,color:"#040709",fontWeight:900 }}>S</div>
+      <h2 style={{ color:"#E8F4F8",fontWeight:800,fontSize:18,margin:"0 0 10px",fontFamily:"'JetBrains Mono',monospace" }}>Firebase Setup Required</h2>
+      <p style={{ color:"#7A9BB5",fontSize:13,lineHeight:1.7,maxWidth:300,margin:"0 0 20px" }}>Add Firebase credentials as GitHub Secrets and rebuild the APK.</p>
     </div>
   );
 }
 
 function OfflineBanner() {
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-950 px-8 text-center">
-      <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-6">
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center px-8 text-center" style={{ backgroundColor: "#080C10" }}>
+      <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: "#0D1520", border: "1px solid #1E3A5F" }}>
         <WifiOff size={36} className="text-red-400" />
       </div>
-      <h2 className="text-xl font-black text-white mb-2" style={{ fontFamily:"'Space Grotesk', sans-serif" }}>No Connection</h2>
-      <p className="text-sm text-slate-400 leading-relaxed mb-8 max-w-[260px]">
+      <h2 className="text-xl font-black mb-2" style={{ fontFamily:"'JetBrains Mono', monospace", color:"#E8F4F8", letterSpacing:"2px" }}>NO CONNECTION</h2>
+      <p className="text-sm leading-relaxed mb-8 max-w-[260px]" style={{ color:"#7A9BB5" }}>
         SNIX needs internet to load. Please enable your mobile data or Wi-Fi, then reload.
       </p>
       <button onClick={() => window.location.reload()}
-        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-emerald-500 text-white font-bold rounded-xl text-sm tracking-wider uppercase shadow-lg active:scale-95 transition-transform">
+        className="flex items-center gap-2 px-6 py-3 font-bold rounded-xl text-sm tracking-wider uppercase active:scale-95 transition-transform" style={{ background:"linear-gradient(90deg, #00A8CC, #00D4FF)", color:"#040709", fontFamily:"'JetBrains Mono',monospace", boxShadow:"0 0 20px rgba(0,212,255,0.3)" }}>
         <RefreshCw size={16} /> Reload App
       </button>
     </div>
@@ -75,13 +75,13 @@ function OfflineBanner() {
 // native Android splash (which always shows the app icon) is seamless.
 function AuthBootstrap() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center bg-slate-950">
-      <div className="w-20 h-20 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/40 mb-6">
+    <div className="flex-1 flex flex-col items-center justify-center" style={{ backgroundColor: "#080C10" }}>
+      <div className="w-20 h-20 rounded-3xl overflow-hidden mb-6" style={{ boxShadow: "0 0 30px rgba(0,212,255,0.3), 0 8px 20px rgba(0,0,0,0.5)" }}>
         <img src={snixIcon} alt="SNIX" className="w-full h-full object-cover" />
       </div>
-      <h1 className="text-3xl font-black text-white tracking-tight mb-1" style={{ fontFamily:"'Space Grotesk', sans-serif" }}>SNIX</h1>
-      <p className="text-xs text-slate-500 mb-8">The Decentralized VPN Hub</p>
-      <span className="animate-spin rounded-full h-5 w-5 border-2 border-emerald-500 border-t-transparent" />
+      <h1 className="text-3xl font-black tracking-tight mb-1" style={{ fontFamily:"'JetBrains Mono', monospace", color:"#E8F4F8", letterSpacing:"4px", textShadow:"0 0 20px rgba(0,212,255,0.5)" }}>SNIX</h1>
+      <p className="text-xs mb-8" style={{ color:"#3A5A78", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"2px" }}>THE DECENTRALIZED VPN HUB</p>
+      <span className="animate-spin rounded-full h-5 w-5 border-2 border-t-transparent" style={{ borderColor: "#00D4FF transparent #00D4FF #00D4FF" }} />
     </div>
   );
 }
@@ -114,7 +114,7 @@ function SyncProgressBar({ syncing }: { syncing: boolean }) {
           left: 0,
           right: 0,
           bottom: 0,
-          background: "linear-gradient(to top, #2563eb, #34d399)",
+          background: "linear-gradient(to top, #00D4FF, #00FF88)",
           borderRadius: "0 2px 2px 0",
         }}
       />
