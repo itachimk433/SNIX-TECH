@@ -217,11 +217,11 @@ export default function LeaderboardModal({ onClose, onAuthorClick, currentUserCo
         <div className="flex px-5 gap-2 shrink-0 pb-3">
           <button
             onClick={() => handleScopeChange("global")}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 ${scope === "global" ? "" style={{ backgroundColor: "#00D4FF", color: "#040709" }} : "bg-slate-100 text-slate-500"}`}
+            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 ${scope === "global" ? "bg-[#00D4FF] text-[#040709]" : "bg-[#111B2A] text-[#3A5A78]"}`}
           ><Globe2 size={13} /> Global</button>
           <button
             onClick={() => handleScopeChange("local")}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 ${scope === "local" ? "" style={{ backgroundColor: "#00D4FF", color: "#040709" }} : "bg-slate-100 text-slate-500"}`}
+            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 ${scope === "local" ? "bg-[#00D4FF] text-[#040709]" : "bg-[#111B2A] text-[#3A5A78]"}`}
           ><MapPin size={13} /> National{countryMeta ? ` ${countryMeta.flag}` : ""}</button>
         </div>
 

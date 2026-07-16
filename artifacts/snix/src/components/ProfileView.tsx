@@ -107,11 +107,13 @@ function AvatarPickerModal({ onSelect, onClose, userUid }: {
         {/* Tabs: Styles | Extra */}
         <div className="flex gap-2">
           <button onClick={() => setTab("styles")}
-            className={`flex-1 py-2 text-[11px] font-bold rounded-xl border transition-all ${tab === "styles" ? "" style={{ backgroundColor: "#00D4FF", color: "#040709", border: "1px solid #00A8CC" }} : "" style={{ backgroundColor: "#111B2A", color: "#7A9BB5", border: "1px solid #1E3A5F" }}}`}>
+            className="flex-1 py-2 text-[11px] font-bold rounded-xl border transition-all"
+            style={tab === "styles" ? { backgroundColor: "#00D4FF", color: "#040709", borderColor: "#00A8CC" } : { backgroundColor: "#111B2A", color: "#7A9BB5", borderColor: "#1E3A5F" }}>
             🎨 Styles
           </button>
           <button onClick={() => setTab("extra")}
-            className={`flex-1 py-2 text-[11px] font-bold rounded-xl border transition-all ${tab === "extra" ? "" style={{ backgroundColor: "#00D4FF", color: "#040709", border: "1px solid #00A8CC" }} : "" style={{ backgroundColor: "#111B2A", color: "#7A9BB5", border: "1px solid #1E3A5F" }}}`}>
+            className="flex-1 py-2 text-[11px] font-bold rounded-xl border transition-all"
+            style={tab === "extra" ? { backgroundColor: "#00D4FF", color: "#040709", borderColor: "#00A8CC" } : { backgroundColor: "#111B2A", color: "#7A9BB5", borderColor: "#1E3A5F" }}>
             ✨ Extra
           </button>
         </div>
@@ -136,9 +138,8 @@ function AvatarPickerModal({ onSelect, onClose, userUid }: {
             <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 no-scrollbar">
               {AVATAR_STYLES.map(s => (
                 <button key={s} onClick={() => setStyle(s)}
-                  className={`relative px-3 py-1.5 text-[10px] font-bold rounded-lg whitespace-nowrap border transition-all ${
-                    style === s ? "" style={{ backgroundColor: "#00D4FF", color: "#040709", border: "1px solid #00A8CC" }}
-                    : "" style={{ backgroundColor: "#111B2A", color: "#7A9BB5", border: "1px solid #1E3A5F" }}}`}>
+                  className="relative px-3 py-1.5 text-[10px] font-bold rounded-lg whitespace-nowrap border transition-all"
+                  style={style === s ? { backgroundColor: "#00D4FF", color: "#040709", borderColor: "#00A8CC" } : { backgroundColor: "#111B2A", color: "#7A9BB5", borderColor: "#1E3A5F" }}>
                   {s}
                 </button>
               ))}

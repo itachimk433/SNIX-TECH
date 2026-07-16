@@ -1243,7 +1243,7 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
                         </div>
                       </div>
                       <button onClick={() => handleCopyCloudLink(post.id)}
-                        className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 shrink-0 ${copiedId===post.id?"" style={{ backgroundColor: "#00CC70", color: "#040709" }}:"bg-emerald-600/30 text-emerald-400 border border-emerald-500/20"}`}>
+                        className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 shrink-0 ${copiedId===post.id?"bg-emerald-400/20 text-emerald-300 border border-emerald-400/30":"bg-emerald-600/30 text-emerald-400 border border-emerald-500/20"}`}>
                         <Cloud size={11} />{copiedId===post.id?"Copied!":/^https?:\/\//i.test(post.configContent||"")?"Copy Link":"Copy Code"}
                       </button>
                     </div>
@@ -1271,7 +1271,7 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
                     <div className="flex items-center gap-2 self-end sm:self-auto">
                       {post.sharingMode==="cloud_only" && (
                         <button onClick={() => handleCopyCloudLink(post.id)}
-                          className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 ${copiedId===post.id?"" style={{ backgroundColor: "#00CC70", color: "#040709" }}:"bg-emerald-600/30 text-emerald-400 border border-emerald-500/20"}`}>
+                          className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 ${copiedId===post.id?"bg-emerald-400/20 text-emerald-300 border border-emerald-400/30":"bg-emerald-600/30 text-emerald-400 border border-emerald-500/20"}`}>
                           <Cloud size={11} />{copiedId===post.id?"Copied!":"Copy Link"}
                         </button>
                       )}
@@ -1298,16 +1298,14 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
                     <div className="mt-2.5 flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
                       {post.sharingMode==="cloud_only" && (
                         <button onClick={() => handleCopyCloudLink(post.id)}
-                          className={`px-2.5 py-1.5 rounded-md text-[9px] font-bold flex items-center gap-1 ${copiedId===post.id?"" style={{ backgroundColor: "#00CC70", color: "#040709" }}:"bg-slate-800 hover:bg-slate-700 text-emerald-300"}`}>
+                          className={`px-2.5 py-1.5 rounded-md text-[9px] font-bold flex items-center gap-1 ${copiedId===post.id?"bg-emerald-400/20 text-emerald-300":"bg-slate-800 hover:bg-slate-700 text-emerald-300"}`}>
                           <Cloud size={11} />{copiedId===post.id?"Copied!":"Copy Cloud Link"}
                         </button>
                       )}
                       {post.sharingMode!=="cloud_only" && (
                         <button onClick={() => handleDownload(post)} disabled={downloadingId === post.id}
                           className={`px-2.5 py-1.5 rounded-md text-[9px] font-bold flex items-center gap-1.5 transition-all min-w-[72px] justify-center
-                            ${downloadedId===post.id?"" style={{ backgroundColor: "#00CC70", color: "#040709" }}
-                            :downloadingId===post.id?"" style={{ backgroundColor: "#111B2A", color: "#7A9BB5" }}
-                            :"" style={{ backgroundColor: "#0D1520", color: "#E8F4F8", border: "1px solid #1E3A5F" }}}`}>
+                            ${downloadedId===post.id?"bg-emerald-400/20 text-emerald-300 border border-emerald-400/30":downloadingId===post.id?"bg-[#111B2A] text-[#7A9BB5]":"bg-[#0D1520] text-[#E8F4F8] border border-[#1E3A5F]"}`}>
                           {downloadingId===post.id
                             ? <><DownloadRing size={11} />Saving…</>
                             : downloadedId===post.id
@@ -1324,7 +1322,7 @@ export default function FeedView({ onAuthorClick, isGuest, onAboutPress, onSignI
                 <div className="flex items-center gap-1.5">
                   {([['heart','❤️',hearts],['ok','👌',oks],['down','👎',downs]] as const).map(([type,emoji,count]) => (
                     <button key={type} onClick={() => handleReaction(post.id, type as 'heart'|'ok'|'down')}
-                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${myReaction===type?"scale-105" style={{ backgroundColor: "rgba(0,212,255,0.12)", color: "#00D4FF", border: "1px solid rgba(0,212,255,0.3)" }}:"" style={{ backgroundColor: "#111B2A", color: "#7A9BB5", border: "1px solid #1E3A5F" }}}`}>
+                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${myReaction===type?"scale-105 bg-cyan-400/10 text-cyan-300 border border-cyan-400/30":"bg-[#111B2A] text-[#7A9BB5] border border-[#1E3A5F]"}`}>
                       <span>{emoji}</span><span className="text-[10px]">{count}</span>
                     </button>
                   ))}
