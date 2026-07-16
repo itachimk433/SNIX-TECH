@@ -206,11 +206,12 @@ export default function AskSnixModal({ onClose, isGuest = false, uid = null }: {
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
           {messages.map((m, i) => (
             <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
-              <div className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap ${
-                m.role === "user"
-                  ? `rounded-br-md ${m.failed ? "" : ""}` 
-                  : "rounded-bl-md" style={{ backgroundColor: "#111B2A", color: "#E8F4F8", border: "1px solid #1E3A5F" }}
-              }`}>
+              <div
+                className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap ${
+                  m.role === "user" ? `rounded-br-md ${m.failed ? "bg-red-500/80 text-white" : "bg-[#00D4FF] text-[#040709]"}` : "rounded-bl-md"
+                }`}
+                style={m.role !== "user" ? { backgroundColor: "#111B2A", color: "#E8F4F8", border: "1px solid #1E3A5F" } : undefined}
+              >
                 {m.text}
               </div>
               {m.role === "user" && m.failed && !sending && (
